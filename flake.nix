@@ -12,7 +12,10 @@
     flake-utils,
   }:
     flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
     in {
       devShells = {
         default = pkgs.mkShell {
@@ -20,9 +23,14 @@
             nodejs
             nodePackages.pnpm
 
+            obsidian
             nodePackages.typescript-language-server
             vscode-langservers-extracted
           ];
+
+          shellHook = ''
+            OBSIDIAN_CONFIG_FOLDER=.
+          '';
         };
       };
     });
