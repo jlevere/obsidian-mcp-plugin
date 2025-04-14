@@ -91,6 +91,8 @@ export default class ObsidianMcpPlugin extends Plugin {
         "/messages",
         (req: express.Request, res: express.Response) => {
           if (this.mcpTransport) {
+            console.log("POST request: ", req);
+
             this.mcpTransport.handlePostMessage(req, res);
             console.log("POST message handled.");
           } else {
