@@ -3,9 +3,16 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 //import { getFileMetadataObject } from "../utils/helpers";
 
+const description = `
+Reads the content of a file from the Obsidian vault.
+The file path should be relative to the root of the vault.
+Returns the raw content of the file as plain text.
+`;
+
 export function registerReadHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "obsidian/vault/read",
+    "read",
+    description,
     {
       path: z.string().describe("Path to the file in the vault"),
     },

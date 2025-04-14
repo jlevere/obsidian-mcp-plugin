@@ -3,9 +3,20 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { SearchResponseItem } from "src/utils/types";
 
+const description = `
+Returns a list of the top-matching markdown files in the vault based on fuzzy search.
+
+Each result includes:
+- filename: the full path of the file in the vault
+- score: a fuzzy match score (lower is better)
+
+Output is sorted by relevance and limited to the specified maximum (default: 5).
+`;
+
 export function registerFuzzySearchHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "obsidian/vault/fuzzy-search",
+    "fuzzy-search",
+    description,
     {
       query: z.string().describe("Search query for vault"),
       limit: z

@@ -7,9 +7,19 @@ import {
   stringifyPatches,
 } from "@sanity/diff-match-patch";
 
+const description = `
+Applies a smart diff to a file in the vault by comparing the current file contents with the full updated version you provide.
+
+The input "changes" should be the full intended contents of the file. The system will compute and apply only the minimal necessary edits.
+
+The result includes:
+- diff: a unified diff-style string showing exactly what changes were applied
+`;
+
 export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "obsidian/vault/diff-edit",
+    "diff-edit",
+    description,
     {
       path: z.string().describe("Path to the file in the vault"),
       changes: z
