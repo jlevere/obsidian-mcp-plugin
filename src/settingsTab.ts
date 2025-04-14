@@ -26,7 +26,6 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
             if (value && !isNaN(Number(value))) {
               this.plugin.settings.port = Number(value);
               await this.plugin.saveSettings();
-              await this.plugin.restartServer(); // Restart after port change
             } else if (value) {
               new Notice("Port must be a number");
             }
@@ -45,7 +44,6 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.bindingHost = value;
             await this.plugin.saveSettings();
-            await this.plugin.restartServer(); // Restart after host change
           })
       );
 
