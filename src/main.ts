@@ -1,34 +1,64 @@
-import { App, Plugin, PluginSettingTab, Setting, Notice } from "obsidian";
-import express, { Request, Response } from "express";
+import { App, Plugin, Notice } from "obsidian";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
+import express from "express";
 import * as http from "http";
 
-import {
-  McpServer,
-  ResourceTemplate,
-} from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { registerVaultTools } from "./vault";
+import { DEFAULT_SETTINGS, PLUGIN_NAME } from "./constants";
+import { ObsidianMcpSettings } from "./utils/types";
+import { ObsidianMcpSettingTab } from "./settingsTab";
 
-import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
-
-export default class LocalRestApi extends Plugin {
+export default class ObsidianMcpPlugin extends Plugin {
+  settings: ObsidianMcpSettings;
   expressApp: express.Express;
   httpServer: http.Server;
+  mcpServer: McpServer;
   mcpTransport: SSEServerTransport | null = null;
 
   async onload() {
-    console.log("LocalRestApi Plugin Loading...");
-    this.setupExpressAndMcp();
-    console.log("LocalRestApi Plugin Loaded.");
-    this.app.workspace.trigger("obsidian-local-rest-api:loaded");
+    console.log(`${PLUGIN_NAME} Plugin Loading...`);
+
+    await this.loadSettings();
+    this.addSettingTab(new ObsidianMcpSettingTab(this.app, this));
+
+    await this.setupExpressAndMcp();
+
+    console.log(`${PLUGIN_NAME} Plugin Loaded.`);
+    this.app.workspace.trigger("obsidian-mcp-plugin:loaded");
   }
 
   async onunload() {
-    console.log("LocalRestApi Plugin Unloading...");
+    console.log(`${PLUGIN_NAME} Plugin Unloading...`);
+
     if (this.httpServer) {
-      this.httpServer.close();
-      console.log("HTTP server closed.");
+      this.httpServer.close(() => {
+        console.log("HTTP server closed.");
+      });
     }
-    console.log("LocalRestApi Plugin Unloaded.");
+
+    console.log(`${PLUGIN_NAME} Plugin Unloaded.`);
+  }
+
+  async loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  }
+
+  async saveSettings() {
+    await this.saveData(this.settings);
+  }
+
+  async restartServer() {
+    if (this.httpServer) {
+      this.httpServer.close(async () => {
+        console.log("HTTP server closed for restart.");
+        await this.setupExpressAndMcp();
+        new Notice(`${PLUGIN_NAME} server restarted.`);
+      });
+    } else {
+      await this.setupExpressAndMcp();
+      new Notice(`${PLUGIN_NAME} server started.`);
+    }
   }
 
   async setupExpressAndMcp() {
@@ -36,80 +66,58 @@ export default class LocalRestApi extends Plugin {
       this.expressApp = express();
       this.httpServer = http.createServer(this.expressApp);
 
-      const server = new McpServer({
-        name: "Echo",
-        version: "1.0.0",
+      this.mcpServer = new McpServer({
+        name: PLUGIN_NAME,
+        version: this.manifest.version,
       });
 
-      server.resource(
-        "echo",
-        new ResourceTemplate("echo://{message}", { list: undefined }),
-        async (uri, { message }) => {
-          console.log(`Resource 'echo' called with message: ${message}`);
-          return {
-            contents: [
-              {
-                uri: uri.href,
-                text: `Resource echo: ${message}`,
-              },
-            ],
-          };
+      // Register all tool modules
+      registerVaultTools(this.app, this.mcpServer);
+      // Removed duplicate addSettingTab
+      // this.addSettingTab(new ObsidianMcpSettingTab(this.app, this));
+
+      // Setup SSE endpoint
+      this.expressApp.get(
+        "/sse",
+        (req: express.Request, res: express.Response) => {
+          this.mcpTransport = new SSEServerTransport("/messages", res);
+          this.mcpServer.connect(this.mcpTransport);
+          console.log("SSE connection established.");
         }
       );
 
-      server.tool("echo", { message: z.string() }, async ({ message }) => {
-        console.log(`Tool 'echo' called with message: ${message}`);
-        return {
-          content: [{ type: "text", text: `Tool echo: ${message}` }],
-        };
-      });
-
-      server.tool(":3", { message: z.string() }, async ({ message }) => {
-        console.log(`Tool ':3' called with message: ${message}`);
-        return {
-          content: [{ type: "text", text: `:3` }],
-        };
-      });
-
-      server.prompt("echo", { message: z.string() }, ({ message }) => {
-        console.log(`Prompt 'echo' called with message: ${message}`);
-        return {
-          messages: [
-            {
-              role: "user",
-              content: {
-                type: "text",
-                text: `Please process this message: ${message}`,
-              },
-            },
-          ],
-        };
-      });
-
-      this.expressApp.get("/sse", (req: Request, res: Response) => {
-        this.mcpTransport = new SSEServerTransport("/messages", res);
-        server.connect(this.mcpTransport);
-        console.log("SSE connection established.");
-      });
-
-      this.expressApp.post("/messages", (req: Request, res: Response) => {
-        if (this.mcpTransport) {
-          this.mcpTransport.handlePostMessage(req, res);
-          console.log("POST message handled.");
-        } else {
-          res.status(400).send("No SSE connection established");
-          console.error("Post message received before SSE connection.");
+      // Setup message handler
+      this.expressApp.post(
+        "/messages",
+        (req: express.Request, res: express.Response) => {
+          if (this.mcpTransport) {
+            this.mcpTransport.handlePostMessage(req, res);
+            console.log("POST message handled.");
+          } else {
+            res.status(400).send("No SSE connection established");
+            console.error("Post message received before SSE connection.");
+          }
         }
-      });
+      );
 
-      const port = 3000;
-      this.httpServer.listen(port, "0.0.0.0", () => {
-        console.log(`McpServer listening on port ${port}`);
-        new Notice(`McpServer started on port ${port}`);
+      // Start the server
+      const port = this.settings.port;
+      const host = this.settings.bindingHost;
+
+      this.httpServer.listen(port, host, () => {
+        console.log(`${PLUGIN_NAME} server listening on ${host}:${port}`);
+        new Notice(`${PLUGIN_NAME} server started on port ${port}`);
       });
     } catch (error) {
-      console.error("Error setting up Express and McpServer:", error);
-      new Notice(`Error setting up Express and McpServer: ${error.message}`);
+      console.error(
+        `Error setting up Express and ${PLUGIN_NAME} server:`,
+        error
+      );
+      new Notice(
+        `Error setting up Express and ${PLUGIN_NAME} server: ${
+          (error as Error).message
+        }`
+      );
     }
   }
 }

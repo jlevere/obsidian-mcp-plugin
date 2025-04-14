@@ -1,58 +1,27 @@
-export interface DataWriteOptions {
-  /**
-   * Time of creation, represented as a unix timestamp, in milliseconds.
-   * Omit this if you want to keep the default behaviour.
-   * @public
-   * */
-  ctime?: number;
-  /**
-   * Time of last modification, represented as a unix timestamp, in milliseconds.
-   * Omit this if you want to keep the default behaviour.
-   * @public
-   */
-  mtime?: number;
+/**
+ * This is the mock base class for obsidian.  This allows running tests without needing obsidian itself running.
+ *
+ * The Obsidian API is pretty big so we only implment a sketch of the api and specific things we need.  This produces linter errors
+ * but it is okay because they should run and test perfectly fine.
+ *
+ *
+ * If you need to add new functionality, check the api docs here https://github.com/obsidianmd/obsidian-api/blob/master/obsidian.d.ts
+ */
 
-}
-class Stat {
-  type: "file" | "folder" = "file";
+export class Keymap {
+  pushScope = jest.fn();
+  popScope = jest.fn();
 }
 
-class DataAdapter {
-  _exists = true;
-  _read = "";
-  _readBinary = new ArrayBuffer(0);
-  _write: [string, string];
-  _writeBinary : [string, ArrayBuffer];
-  _remove: [string];
-  _stat = new Stat();
+export class Scope {
+  register = jest.fn();
+  unregister = jest.fn();
+}
 
-  async exists(path: string): Promise<boolean> {
-    return this._exists;
-  }
-
-  async stat(path: string): Promise<Stat> {
-    return this._stat;
-  }
-
-  async read(path: string): Promise<string> {
-    return this._read;
-  }
-
-  async readBinary(path: string): Promise<ArrayBuffer> {
-    return this._readBinary;
-  }
-
-  async write(path: string, content: string, option?:DataWriteOptions): Promise<void> {
-    this._write = [path, content];
-  }
-
-  async writeBinary(path: string, content: ArrayBuffer, option?:DataWriteOptions): Promise<void> {
-    this._writeBinary = [path,content]
-  }
-
-  async remove(path: string): Promise<void> {
-    this._remove = [path];
-  }
+export class Workspace {
+  getActiveFile = jest.fn().mockReturnValue(null);
+  getLayout = jest.fn();
+  //... other workspace methods
 }
 
 export class Vault {
@@ -62,120 +31,206 @@ export class Vault {
   _files: TFile[] = [new TFile()];
   _markdownFiles: TFile[] = [];
 
-  adapter = new DataAdapter();
-
-  async read(file: TFile): Promise<string> {
-    return this._read;
-  }
-
-  async cachedRead(file: TFile): Promise<string> {
-    return this._cachedRead;
-  }
-
-  async createFolder(path: string): Promise<void> {}
-
-  getFiles(): TFile[] {
-    return this._files;
-  }
-
-  getMarkdownFiles(): TFile[] {
-    return this._markdownFiles;
-  }
-
-  getAbstractFileByPath(path: string): TFile {
-    return this._getAbstractFileByPath;
-  }
-}
-
-export class Loc {
-  line = -1;
-}
-
-export class Pos {
-  start = new Loc();
-  end = new Loc();
-}
-
-export class HeadingCache {
-  level = 1;
-  heading = "";
-  position = new Pos();
-}
-
-export class CachedMetadata {
-  headings: HeadingCache[] = [];
-  frontmatter: Record<string, unknown> = {};
-  tags: { tag: string }[] = [];
+  read = jest.fn().mockResolvedValue("");
+  create = jest.fn().mockResolvedValue(null);
+  getAbstractFileByPath = jest.fn().mockReturnValue(null);
+  //... other vault methods
 }
 
 export class MetadataCache {
-  _getFileCache = new CachedMetadata();
+  getFileCache = jest.fn().mockReturnValue(null);
+  getCache = jest.fn().mockReturnValue(null);
+  // ... other metadataCache methods
+  on = jest.fn();
+  off = jest.fn();
+  offref = jest.fn();
+  trigger = jest.fn();
+  tryTrigger = jest.fn();
 
-  getFileCache(file: TFile): CachedMetadata {
-    return this._getFileCache;
-  }
+  resolvedLinks: Record<string, Record<string, number>> = {};
+  unresolvedLinks: Record<string, Record<string, number>> = {};
 }
 
-export class Workspace {
-  async openLinkText(
-    path: string,
-    base: string,
-    newLeaf: boolean
-  ): Promise<void> {
-    return new Promise((resolve, reject) => resolve());
-  }
-
-  getActiveFile(): TFile {
-    return new TFile();
-  }
+export class FileManager {
+  getNewFileParent = jest.fn();
+  renameFile = jest.fn();
+  trashFile = jest.fn();
+  generateMarkdownLink = jest.fn();
+  processFrontMatter = jest.fn();
+  setFrontMatter = jest.fn();
+  // ... other fileManager methods
 }
+
+export class UserEvent {}
 
 export class App {
-  _executeCommandById: [string];
-
-  vault = new Vault();
+  keymap = new Keymap();
+  scope = new Scope();
   workspace = new Workspace();
+  vault = new Vault();
   metadataCache = new MetadataCache();
+  fileManager = new FileManager();
+  lastEvent: UserEvent | null = null;
+
+  loadLocalStorage = jest.fn().mockReturnValue(null);
+  saveLocalStorage = jest.fn();
+  //... other app methods
   commands = {
-    commands: {} as Record<string, Command>,
-
-    executeCommandById: (id: string) => {
-      this._executeCommandById = [id];
-    },
+    executeCommandById: jest.fn(),
+    findCommand: jest.fn(),
+    listCommands: jest.fn(),
+    on: jest.fn(),
+    removeCommand: jest.fn(),
+    register: jest.fn(),
+    registerDom: jest.fn(),
   };
+  plugins = {
+    getPlugin: jest.fn(),
+    enablePlugin: jest.fn(),
+    disablePlugin: jest.fn(),
+    plugins: {},
+  };
+  //settings = new PluginSettings();
+  //view = new AppView();
+  //internalPlugins = new InternalPlugins();
+  //workspacePlugins = new WorkspacePlugins();
+  //js_to_load = [];
+  //css_to_load = [];
+  //modals = [];
+  //views = {};
+  //abstractPopovers = [];
+  //toast = new Toast();
 }
 
-export class Command {
-  id = "";
+export function addIcon(iconId: string, svgContent: string): void {}
+
+export let apiVersion: string = "1.0.0";
+
+export class TAbstractFile {
+  path = "";
   name = "";
+  parent: TFolder | null = null;
 }
 
-export class FileStats {
-  ctime = 0;
-  mtime = 0;
+export class TFile extends TAbstractFile {
+  basename = "";
+  extension = "";
   size = 0;
+  //... tfile properties
 }
 
-export class TFile {
-  path = "somefile.md";
-  stat: FileStats = new FileStats();
+export class TFolder extends TAbstractFile {
+  children: TAbstractFile[] = [];
+  //... tfolder properties
 }
 
-export class PluginManifest {
-  version = "";
+export class EditorPosition {
+  line = 0;
+  ch = 0;
 }
 
-export class SettingTab {}
-
-export const apiVersion = "1.0.0";
-
-export class SearchResult {
-  score = -10;
-  matches: [number, number][] = [];
+export class Editor {
+  getValue = jest.fn().mockReturnValue("");
+  setValue = jest.fn();
+  getCursor = jest.fn().mockReturnValue(new EditorPosition());
+  getSelection = jest.fn().mockReturnValue("");
+  replaceSelection = jest.fn();
+  //...
 }
 
-export function prepareSimpleSearch(
-  query: string
-): (value: string) => null | SearchResult {
-  return null;
+export class MarkdownView {
+  editor: any;
+  //...
+  getViewData = jest.fn().mockReturnValue("");
+  setViewData = jest.fn();
+  clear = jest.fn();
 }
+
+export class WorkspaceLeaf {
+  view: any;
+  containerEl: any;
+  //...
+  openFile = jest.fn();
+  open = jest.fn();
+  setViewState = jest.fn();
+  getDisplayText = jest.fn().mockReturnValue("");
+  on = jest.fn();
+  off = jest.fn();
+  detach = jest.fn();
+  parent: any;
+  getRoot = jest.fn();
+  getContainer = jest.fn();
+  getActiveViewOfType = jest.fn();
+}
+
+export class View {
+  leaf: any;
+  //...
+  getViewType = jest.fn();
+  getDisplayText = jest.fn().mockReturnValue("");
+  on = jest.fn();
+  off = jest.fn();
+  registerView = jest.fn();
+  load = jest.fn();
+  unload = jest.fn();
+  getState = jest.fn();
+  setState = jest.fn();
+}
+
+export class MarkdownFileInfo {}
+
+export class Component {
+  load = jest.fn();
+  unload = jest.fn();
+  onLoad = jest.fn();
+  onUnload = jest.fn();
+  addChild = jest.fn();
+  removeChild = jest.fn();
+  register = jest.fn();
+  registerEvent = jest.fn();
+  registerDomEvent = jest.fn();
+  registerInterval = jest.fn();
+}
+
+export class Modal {
+  open = jest.fn();
+  close = jest.fn();
+  onOpen = jest.fn();
+  onClose = jest.fn();
+  setTitle = jest.fn();
+  setContent = jest.fn();
+  containerEl: any;
+  modalEl: any;
+  contentEl: any;
+  titleEl: any;
+  scope: any;
+  app: any;
+}
+
+export function normalizePath(path: string): string {
+  return path;
+}
+
+export class Notice {
+  constructor(message: string | DocumentFragment, duration?: number) {}
+  setMessage = jest.fn();
+  hide = jest.fn();
+}
+
+export const moment = () => {};
+
+export const Platform = {
+  isDesktop: true,
+  isMobile: false,
+  isDesktopApp: true,
+  isMobileApp: false,
+  isIosApp: false,
+  isAndroidApp: false,
+  isPhone: false,
+  isTablet: false,
+  isMacOS: false,
+  isWin: false,
+  isLinux: false,
+  isSafari: false,
+  resourcePathPrefix: "",
+};
