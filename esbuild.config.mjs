@@ -11,7 +11,7 @@ if you want to view the source, please visit the github repository of this plugi
 `;
 
 const prod = process.argv[2] === "production";
-const outfile = "main.js";
+const outfile = prod ? "dist/main.js" : "main.js";
 
 mkdirSync(dirname(outfile), { recursive: true });
 
@@ -53,7 +53,7 @@ const options = {
   logLevel: "info",
   sourcemap: prod ? false : "inline",
   treeShaking: true,
-  minify: false,
+  minify: true,
   outfile,
 };
 

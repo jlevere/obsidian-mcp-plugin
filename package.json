@@ -11,7 +11,9 @@
   "scripts": {
     "dev": "pnpm node esbuild.config.mjs",
     "build": "pnpm tsc -noEmit -skipLibCheck && pnpm node esbuild.config.mjs production",
-    "test": "pnpm jest"
+    "test": "pnpm jest",
+    "inspect": "",
+    "package": "pnpm build && zip plugin.zip dist/main.js manifest.json styles.css"
   },
   "keywords": [],
   "author": "",
