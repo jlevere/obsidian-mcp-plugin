@@ -43,7 +43,7 @@ export function registerFuzzySearchHandler(app: App, mcpServer: McpServer) {
           }
         }
 
-        results.sort((a, b) => a.score - b.score);
+        results.sort((a, b) => b.score - a.score);
         const limitedResults = results.slice(0, limit);
 
         return {
