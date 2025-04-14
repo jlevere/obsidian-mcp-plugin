@@ -1,8 +1,6 @@
-// tests/vault/read.test.ts
-import { App, TFile } from "../../mocks/obsidian";
+import { App, TFile, Vault } from "../../mocks/obsidian";
 import { registerReadHandler } from "../../src/vault/read";
 
-// Mock the MCP server module
 jest.mock("@modelcontextprotocol/sdk/server/mcp.js", () => {
   return {
     McpServer: jest.fn().mockImplementation(() => ({
@@ -12,21 +10,19 @@ jest.mock("@modelcontextprotocol/sdk/server/mcp.js", () => {
 });
 
 describe("Vault Read Handler", () => {
-  // Setup mocks
   let mockApp: App;
   let mockMcpServer: { tool: jest.Mock };
   let handlerFunction: Function;
 
   beforeEach(() => {
-    // Reset mocks
     jest.clearAllMocks();
 
-    // Setup mock app with required behavior
+    // Setup the Obsidian app mock
     mockApp = new App();
     mockMcpServer = { tool: jest.fn() };
 
     // Register the handler
-    // This always generates linter erros, its okay, see mocks/obsidian.ts
+    // This always generates linter errors, its okay, see mocks/obsidian.ts
     registerReadHandler(mockApp, mockMcpServer as any);
 
     // Extract the handler function for direct testing
@@ -44,26 +40,29 @@ describe("Vault Read Handler", () => {
   });
 
   it("returns file content when file exists", async () => {
-    // Setup mock file
+    // Setup mock file and vault behavior
     const mockFile = new TFile();
     mockFile.path = "test-file.md";
+    const fileContent = "Test file content";
 
     // Configure mock behavior
-    mockApp.vault._getAbstractFileByPath = mockFile;
-    mockApp.vault._read = "Test file content";
+    (mockApp.vault.getAbstractFileByPath as jest.Mock).mockReturnValue(
+      mockFile
+    );
+    (mockApp.vault.read as jest.Mock).mockResolvedValue(fileContent);
 
     // Call the handler directly
     const result = await handlerFunction({ path: "test-file.md" });
 
     // Verify results
     expect(result).toEqual({
-      content: [{ type: "text", text: "Test file content" }],
+      content: [{ type: "text", text: fileContent }],
     });
   });
 
   it("returns error when file is not found", async () => {
     // Configure mock behavior for file not found
-    mockApp.vault._getAbstractFileByPath = null;
+    (mockApp.vault.getAbstractFileByPath as jest.Mock).mockReturnValue(null);
 
     // Call the handler directly
     const result = await handlerFunction({ path: "nonexistent.md" });
@@ -78,12 +77,15 @@ describe("Vault Read Handler", () => {
   it("handles exceptions during file reading", async () => {
     // Setup mock file
     const mockFile = new TFile();
+    mockFile.path = "error-file.md";
 
     // Configure mock to throw exception
-    mockApp.vault._getAbstractFileByPath = mockFile;
-    mockApp.vault.read = jest
-      .fn()
-      .mockRejectedValue(new Error("Read operation failed"));
+    (mockApp.vault.getAbstractFileByPath as jest.Mock).mockReturnValue(
+      mockFile
+    );
+    (mockApp.vault.read as jest.Mock).mockRejectedValue(
+      new Error("Read operation failed")
+    );
 
     // Call the handler directly
     const result = await handlerFunction({ path: "error-file.md" });

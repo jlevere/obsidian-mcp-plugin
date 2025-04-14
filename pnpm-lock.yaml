@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@sanity/diff-match-patch':
+        specifier: ^3.2.0
+        version: 3.2.0
       '@types/response-time':
         specifier: ^2.3.8
         version: 2.3.8
@@ -1040,6 +1043,10 @@ packages:
 
   '@radix-ui/rect@1.1.1':
     resolution: {integrity: sha512-HPwpGIzkl28mWyZqG52jiqDJ12waP11Pa1lGoiyUkIEuMLBP0oeK/C89esbXrxsky5we7dfd8U58nm0SgAWpVw==}
+
+  '@sanity/diff-match-patch@3.2.0':
+    resolution: {integrity: sha512-4hPADs0qUThFZkBK/crnfKKHg71qkRowfktBljH2UIxGHHTxIzt8g8fBiXItyCjxkuNy+zpYOdRMifQNv8+Yww==}
+    engines: {node: '>=18.18'}
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -4049,6 +4056,8 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
 
   '@radix-ui/rect@1.1.1': {}
+
+  '@sanity/diff-match-patch@3.2.0': {}
 
   '@sinclair/typebox@0.27.8': {}
 
