@@ -18,7 +18,7 @@ The result includes:
 
 export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "diff-edit",
+    "diff-edit-file",
     description,
     {
       path: z.string().describe("Path to the file in the vault"),
@@ -31,9 +31,18 @@ export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
     async ({ path, changes }) => {
       try {
         const file = app.vault.getAbstractFileByPath(path);
-        if (!file || !(file instanceof TFile)) {
+        if (!file) {
           return {
             content: [{ type: "text", text: `File not found: ${path}` }],
+            isError: true,
+          };
+        }
+
+        if (!(file instanceof TFile)) {
+          return {
+            content: [
+              { type: "text", text: `Provided path is a folder: ${path}` },
+            ],
             isError: true,
           };
         }

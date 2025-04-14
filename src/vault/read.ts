@@ -11,7 +11,7 @@ Returns the raw content of the file as plain text.
 
 export function registerReadHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "read",
+    "read-file",
     description,
     {
       path: z.string().describe("Path to the file in the vault"),
