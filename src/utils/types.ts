@@ -10,7 +10,6 @@ export interface FileMetadataObject {
   frontmatter: Record<string, unknown>;
   stat: FileStats;
   path: string;
-  content: string;
 }
 
 export interface SearchContext {

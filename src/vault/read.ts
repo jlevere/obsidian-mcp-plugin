@@ -35,7 +35,7 @@ export function registerReadHandler(app: App, mcpServer: McpServer) {
             //{ type: "resource", resource: { json: fileMetadata } },
             //TODO: id like to include a reference to a resource with the file meatadata
             // This would need to be a solid reference uri and all that as in
-            // https://modelcontextprotocol.io/specification/2024-11-05/server/tools#embedded-resources
+            // https://modelcontextprotocol.io/specification/2025-03-26/server/tools#embedded-resources
           ],
         };
       } catch (error) {
