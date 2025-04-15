@@ -27,10 +27,6 @@
             nodePackages.typescript-language-server
             vscode-langservers-extracted
           ];
-
-          shellHook = ''
-            OBSIDIAN_CONFIG_FOLDER=.
-          '';
         };
       };
     });

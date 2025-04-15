@@ -13,7 +13,7 @@
     "build": "pnpm tsc -noEmit -skipLibCheck && pnpm node esbuild.config.mjs production",
     "test": "pnpm jest",
     "inspect": "npx @modelcontextprotocol/inspector pnpm node main.js",
-    "package": "pnpm build && zip plugin.zip dist/main.js manifest.json styles.css"
+    "package": "pnpm build && zip plugin.zip dist/main.js manifest.json"
   },
   "keywords": [],
   "author": "",

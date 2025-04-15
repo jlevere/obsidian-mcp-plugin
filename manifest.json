@@ -2,7 +2,7 @@
 	"id": "obsidian-mcp-plugin",
 	"name": "obsidian-mcp-plugin",
 	"version": "0.0.1",
-	"minAppVersion": "0.12.0",
+	"minAppVersion": "1.8.0",
 	"description": "Allow an AI to interact with your notes in Obsidian via MCP",
 	"author": "jlevere",
 	"authorUrl": "https://github.com/jlevere",

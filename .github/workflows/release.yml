@@ -8,6 +8,9 @@ on:
         required: true
         type: string
 
+env:
+  PLUGIN_NAME: obsidian-mcp-plugin
+
 jobs:
   package:
     runs-on: ubuntu-latest
@@ -37,11 +40,15 @@ jobs:
     - name: build
       run: pnpm build
 
+    - name: Create Manual Install Zip
+      run: |
+          mkdir ${{ env.PLUGIN_NAME }}
+          cp dist/main.js manifest.json ${{ env.PLUGIN_NAME }}
+          zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
+
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          dist/main.js
-          manifest.json
-          styles.css
+          ${{ env.PLUGIN_NAME }}.zip
         tag_name: ${{ github.event.inputs.version }}
