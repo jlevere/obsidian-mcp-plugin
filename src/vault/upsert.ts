@@ -1,10 +1,10 @@
-import { App, TFile } from "obsidian";
+import { App, TFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 const description = `
 Upserts a file in the vault. If the file doesn't exist, it is created with the provided content.
-If it exists, the provided content is appended to the end of the file.
+If it exists, the provided content is appended to the end of the file.  The path will be normalized.
 
 FILENAME MUST END IN '.md' MUST BE MARKDOWN EXTENTION
 `;
@@ -19,13 +19,18 @@ export function registerUpsertFileHandler(app: App, mcpServer: McpServer) {
     },
     async ({ path, content }) => {
       try {
-        const file = app.vault.getAbstractFileByPath(path);
+        const normPath = normalizePath(path);
+
+        const file = app.vault.getAbstractFileByPath(normPath);
 
         if (file) {
           if (!(file instanceof TFile)) {
             return {
               content: [
-                { type: "text", text: `Provided path is a folder: ${path}` },
+                {
+                  type: "text",
+                  text: `Provided normPath is a folder: ${normPath}`,
+                },
               ],
               isError: true,
             };
@@ -37,22 +42,22 @@ export function registerUpsertFileHandler(app: App, mcpServer: McpServer) {
           }
           fileContents += content;
 
-          await app.vault.adapter.write(path, fileContents);
+          await app.vault.adapter.write(normPath, fileContents);
           return {
-            content: [{ type: "text", text: `File updated: ${path}` }],
+            content: [{ type: "text", text: `File updated: ${normPath}` }],
           };
         } else {
-          const lastSlashIndex = path.lastIndexOf("/");
+          const lastSlashIndex = normPath.lastIndexOf("/");
           if (lastSlashIndex !== -1) {
-            const folderPath = path.substring(0, lastSlashIndex);
+            const folderPath = normPath.substring(0, lastSlashIndex);
             try {
               await app.vault.createFolder(folderPath);
             } catch (err) {}
           }
 
-          await app.vault.create(path, content);
+          await app.vault.create(normPath, content);
           return {
-            content: [{ type: "text", text: `File created: ${path}` }],
+            content: [{ type: "text", text: `File created: ${normPath}` }],
           };
         }
       } catch (error: any) {
