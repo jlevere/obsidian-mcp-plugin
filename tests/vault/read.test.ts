@@ -13,6 +13,7 @@ describe("Vault Read Handler", () => {
   let mockApp: App;
   let mockMcpServer: { tool: jest.Mock };
   let handlerFunction: Function;
+  let zodSchema: {};
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -26,15 +27,15 @@ describe("Vault Read Handler", () => {
     registerReadHandler(mockApp, mockMcpServer as any);
 
     // Extract the handler function for direct testing
-    handlerFunction = mockMcpServer.tool.mock.calls[0][2];
+    handlerFunction = mockMcpServer.tool.mock.calls[0][3];
+    zodSchema = mockMcpServer.tool.mock.calls[0][2];
   });
 
   it("registers the correct tool with the MCP server", () => {
     expect(mockMcpServer.tool).toHaveBeenCalledWith(
-      "obsidian/vault/read",
-      expect.objectContaining({
-        path: expect.any(Object), // This represents the Zod schema
-      }),
+      "read-file",
+      expect.any(String),
+      expect.objectContaining(zodSchema),
       expect.any(Function)
     );
   });

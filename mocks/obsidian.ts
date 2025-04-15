@@ -34,6 +34,8 @@ export class Vault {
   read = jest.fn().mockResolvedValue("");
   create = jest.fn().mockResolvedValue(null);
   getAbstractFileByPath = jest.fn().mockReturnValue(null);
+  getMarkdownFiles = jest.fn().mockReturnValue([]);
+  cachedRead = jest.fn().mockResolvedValue("");
   //... other vault methods
 }
 
@@ -234,3 +236,5 @@ export const Platform = {
   isSafari: false,
   resourcePathPrefix: "",
 };
+
+export const prepareFuzzySearch = jest.fn();
