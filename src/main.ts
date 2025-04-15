@@ -5,6 +5,7 @@ import express from "express";
 import * as http from "http";
 
 import { registerVaultTools } from "./vault";
+import { registerResources } from "./resources";
 import { DEFAULT_SETTINGS, PLUGIN_NAME } from "./constants";
 import { ObsidianMcpSettings } from "./utils/types";
 import { ObsidianMcpSettingTab } from "./settingsTab";
@@ -15,6 +16,9 @@ export default class ObsidianMcpPlugin extends Plugin {
   httpServer: http.Server;
   mcpServer: McpServer;
   mcpTransport: SSEServerTransport | null = null;
+  registeredTools: string[] = [];
+  registeredResources: string[] = [];
+  registeredPrompts: string[] = [];
 
   async onload() {
     console.log(`${PLUGIN_NAME} Plugin Loading...`);
@@ -71,12 +75,12 @@ export default class ObsidianMcpPlugin extends Plugin {
         version: this.manifest.version,
       });
 
-      // Register all tool modules
       registerVaultTools(this.app, this.mcpServer);
-      // Removed duplicate addSettingTab
-      // this.addSettingTab(new ObsidianMcpSettingTab(this.app, this));
+      this.registeredTools = this.getRegisteredToolNames();
 
-      // Setup SSE endpoint
+      registerResources(this.app, this.mcpServer);
+      this.registeredResources = this.getRegisteredResourceNames();
+
       this.expressApp.get(
         "/sse",
         (req: express.Request, res: express.Response) => {
@@ -86,13 +90,10 @@ export default class ObsidianMcpPlugin extends Plugin {
         }
       );
 
-      // Setup message handler
       this.expressApp.post(
         "/messages",
         (req: express.Request, res: express.Response) => {
           if (this.mcpTransport) {
-            console.log("POST request: ", req);
-
             this.mcpTransport.handlePostMessage(req, res);
             console.log("POST message handled.");
           } else {
@@ -121,5 +122,13 @@ export default class ObsidianMcpPlugin extends Plugin {
         }`
       );
     }
+  }
+
+  private getRegisteredToolNames(): string[] {
+    return Object.keys(this.mcpServer["_registeredTools"] || {});
+  }
+
+  private getRegisteredResourceNames(): string[] {
+    return Object.keys(this.mcpServer["_registeredResources"] || {});
   }
 }

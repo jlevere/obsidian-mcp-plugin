@@ -55,5 +55,40 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           await this.plugin.restartServer();
         })
       );
+    // Display registered tools
+    containerEl.createEl("h3", { text: "Registered Tools" });
+    this.displayRegisteredItems(
+      containerEl,
+      this.plugin.registeredTools,
+      "No tools registered."
+    );
+
+    // Display registered resources
+    containerEl.createEl("h3", { text: "Registered Resources" });
+    this.displayRegisteredItems(
+      containerEl,
+      this.plugin.registeredResources,
+      "No resources registered."
+    );
+
+    // Display registered prompts - removed prompts.
+    containerEl.createEl("h3", { text: "Registered Prompts" });
+    containerEl.createEl("p", { text: "No prompts registered." });
+  }
+
+  private displayRegisteredItems(
+    containerEl: HTMLElement,
+    items: string[],
+    emptyMessage: string
+  ) {
+    if (items.length > 0) {
+      const itemList = containerEl.createEl("ul");
+      items.forEach((itemName) => {
+        const listItem = itemList.createEl("li");
+        listItem.textContent = itemName;
+      });
+    } else {
+      containerEl.createEl("p", { text: emptyMessage });
+    }
   }
 }

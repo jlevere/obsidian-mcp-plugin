@@ -63,7 +63,7 @@ Each tool is accessible through the MCP protocol, allowing external applications
 
 ## Unique Approach
 
-This plugin distinguishes itself by directly integrating the MCP server into Obsidian. Traditional methods often involve running a separate server that communicates with Obsidian via its REST API (if available). This plugin's approach offers potential advantages in terms of:
+Instead of relying on a separate server to interact with Obsidian over a REST API, this plugin runs the MCP server directly inside the Obsidian process. This design offers several advantages:
 
 - **Simplicity:** Fewer components to set up and manage.
 - **Performance:** Reduced overhead by eliminating inter-process communication.
