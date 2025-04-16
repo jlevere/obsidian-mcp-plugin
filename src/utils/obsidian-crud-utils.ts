@@ -15,13 +15,10 @@ export async function ensureDirectoryExists(app: App, dirPath: string): Promise<
       console.log(`Created directory: ${normalizedDirPath}`);
     }
   } catch (err) {
-    // Check if error is because folder already exists (race condition or similar)
     if (!err.message || !err.message.includes('already exists')) {
       console.error(`Could not ensure directory exists: ${normalizedDirPath}`, err);
-      // Re-throw or handle more specifically if needed
       throw new Error(`Failed to ensure directory exists: ${normalizedDirPath}. ${err.message}`);
     }
-    // If it already exists, we can ignore the error
     console.log(`Directory already exists (ignoring creation error): ${normalizedDirPath}`);
   }
 }
@@ -41,13 +38,11 @@ export function parseFrontmatter(content: string, cache: ReturnType<MetadataCach
       const frontmatterText = content.slice(cache.frontmatterPosition.start.offset + 3, cache.frontmatterPosition.end.offset - 3);
       existingData = (yaml.load(frontmatterText) as Record<string, any>) || {};
       bodyContent = content.slice(cache.frontmatterPosition.end.offset);
-      // Ensure body starts with a newline if it's not empty
       if (bodyContent.length > 0 && !bodyContent.startsWith('\n')) {
         bodyContent = '\n' + bodyContent;
       }
     } catch (e) {
       console.warn(`Failed to parse existing YAML, treating as empty:`, e);
-      // Keep existingData = {}, bodyContent = originalContent (which it is)
     }
   }
   return { data: existingData, body: bodyContent };
@@ -74,17 +69,14 @@ export function mergeDataWithDefaults(
     const valueKey = key as keyof typeof newData;
     const newValue = newData[valueKey];
 
-    // Always update last_modified
     if (valueKey === 'last_modified') {
       updatedData[valueKey] = newValue;
       return;
     }
 
-    // Update only if the new value is different from the default
     if (Object.hasOwnProperty.call(defaults, valueKey)) {
       const defaultValue = defaults[valueKey];
       let isDefaultValue = false;
-      // Simple deep comparison for arrays (adjust if more complex objects needed)
       if (Array.isArray(newValue) && Array.isArray(defaultValue)) {
         isDefaultValue = JSON.stringify(newValue) === JSON.stringify(defaultValue);
       } else {
@@ -94,12 +86,10 @@ export function mergeDataWithDefaults(
         updatedData[valueKey] = newValue;
       }
     } else {
-      // If key is not in defaults (e.g., required fields or manually added ones), update it
       updatedData[valueKey] = newValue;
     }
   });
 
-  // Ensure last_modified is present if it somehow wasn't in newData
   if (!updatedData.last_modified && newData.last_modified) {
     updatedData.last_modified = newData.last_modified;
   }
@@ -136,13 +126,10 @@ export async function createFileWithFrontmatter(
   const normalizedFilePath = normalizePath(filePath);
   const parentDir = normalizedFilePath.substring(0, normalizedFilePath.lastIndexOf('/'));
 
-  // Ensure parent directory exists first
   await ensureDirectoryExists(app, parentDir);
 
-  // Generate initial content
   const yamlSkeleton = generateYamlFrontmatter(initialData);
 
-  // Create the file
   try {
     const newFile = await app.vault.create(normalizedFilePath, yamlSkeleton);
     console.log(`Created file with frontmatter: ${normalizedFilePath}`);
@@ -169,11 +156,9 @@ export async function updateFileFrontmatter(
     const originalContent = await app.vault.read(file);
     const cache = app.metadataCache.getFileCache(file);
 
-    const { body } = parseFrontmatter(originalContent, cache); // Only need body here
+    const { body } = parseFrontmatter(originalContent, cache);
     const newYamlString = generateYamlFrontmatter(updatedData);
 
-    // Reconstruct content
-    // Add a newline before body if body exists, otherwise just a newline after frontmatter
     const finalContent = newYamlString + (body.trim() === '' ? '\n' : body);
 
     await app.vault.modify(file, finalContent);

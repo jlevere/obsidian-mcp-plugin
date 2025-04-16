@@ -7,6 +7,8 @@ import { registerVaultTreeHandler } from "./tree";
 import { registerUpsertFileHandler } from "./upsert";
 import { registerUpdateMachineHandler } from "./update-machine";
 import { registerUpdateUserHandler } from "./update-user";
+import { registerUpdateClientHandler } from "./update-client";
+import { registerUpdateDomainHandler } from "./update-domain";
 
 export function registerVaultTools(app: App, mcpServer: McpServer) {
   registerReadHandler(app, mcpServer);
@@ -16,4 +18,6 @@ export function registerVaultTools(app: App, mcpServer: McpServer) {
   registerUpsertFileHandler(app, mcpServer);
   registerUpdateMachineHandler(app, mcpServer);
   registerUpdateUserHandler(app, mcpServer);
+  registerUpdateClientHandler(app, mcpServer);
+  registerUpdateDomainHandler(app, mcpServer);
 }

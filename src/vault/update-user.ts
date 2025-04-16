@@ -1,10 +1,8 @@
 import { App, TFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import yaml from "js-yaml";
 import {
   createFileWithFrontmatter,
-  ensureDirectoryExists,
   mergeDataWithDefaults,
   parseFrontmatter,
   updateFileFrontmatter
