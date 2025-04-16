@@ -32,13 +32,15 @@ export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
       try {
         let target: TAbstractFile;
         if (dir) {
-          target = app.vault.getAbstractFileByPath(dir);
+          // Normalize the directory path by removing any trailing slashes
+          const normalizedDir = dir.replace(/[\/\\]+$/, "");
+          target = app.vault.getAbstractFileByPath(normalizedDir);
           if (!target || !(target instanceof TFolder)) {
             return {
               content: [
                 {
                   type: "text",
-                  text: `Directory not found or is not a folder: ${dir}`,
+                  text: `Directory not found or is not a folder: ${normalizedDir}`,
                 },
               ],
               isError: true,
@@ -86,3 +88,4 @@ export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
     }
   );
 }
+

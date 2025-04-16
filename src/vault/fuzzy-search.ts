@@ -4,7 +4,7 @@ import { z } from "zod";
 import { SearchResponseItem } from "src/utils/types";
 
 const description = `
-Returns a list of the top-matching markdown files in the vault based on fuzzy search.
+Searches the contents of the files in the vault for a given string. Returns the matching filenames and scores.
 
 Each result includes:
 - filename: the full path of the file in the vault
