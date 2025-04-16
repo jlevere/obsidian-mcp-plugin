@@ -1,4 +1,4 @@
-import { App, TFile } from "obsidian";
+import { App, TFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import {
@@ -30,10 +30,11 @@ export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
     },
     async ({ path, changes }) => {
       try {
-        const file = app.vault.getAbstractFileByPath(path);
+        const normPath = normalizePath(path);
+        const file = app.vault.getAbstractFileByPath(normPath);
         if (!file) {
           return {
-            content: [{ type: "text", text: `File not found: ${path}` }],
+            content: [{ type: "text", text: `File not found: ${normPath}` }],
             isError: true,
           };
         }
@@ -41,7 +42,7 @@ export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
         if (!(file instanceof TFile)) {
           return {
             content: [
-              { type: "text", text: `Provided path is a folder: ${path}` },
+              { type: "text", text: `Provided path is a folder: ${normPath}` },
             ],
             isError: true,
           };

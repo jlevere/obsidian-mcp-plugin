@@ -1,4 +1,4 @@
-import { App, TFile } from "obsidian";
+import { App, TFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 //import { getFileMetadataObject } from "../utils/helpers";
@@ -18,10 +18,11 @@ export function registerReadHandler(app: App, mcpServer: McpServer) {
     },
     async ({ path }) => {
       try {
-        const file = app.vault.getAbstractFileByPath(path);
+        const normPath = normalizePath(path);
+        const file = app.vault.getAbstractFileByPath(normPath);
         if (!file || !(file instanceof TFile)) {
           return {
-            content: [{ type: "text", text: `File not found: ${path}` }],
+            content: [{ type: "text", text: `File not found: ${normPath}` }],
             isError: true,
           };
         }

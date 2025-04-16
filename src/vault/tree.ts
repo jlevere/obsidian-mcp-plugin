@@ -1,4 +1,4 @@
-import { App, TFile, TFolder, TAbstractFile } from "obsidian";
+import { App, TFile, TFolder, TAbstractFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
@@ -32,8 +32,7 @@ export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
       try {
         let target: TAbstractFile;
         if (dir) {
-          // Normalize the directory path by removing any trailing slashes
-          const normalizedDir = dir.replace(/[\/\\]+$/, "");
+          const normalizedDir = normalizePath(dir);
           target = app.vault.getAbstractFileByPath(normalizedDir);
           if (!target || !(target instanceof TFolder)) {
             return {
@@ -88,4 +87,3 @@ export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
     }
   );
 }
-
