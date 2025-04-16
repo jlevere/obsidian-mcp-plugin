@@ -6,6 +6,7 @@ import { registerFuzzySearchHandler } from "./fuzzy-search";
 import { registerVaultTreeHandler } from "./tree";
 import { registerUpsertFileHandler } from "./upsert";
 import { registerUpdateMachineHandler } from "./update-machine";
+import { registerUpdateUserHandler } from "./update-user";
 
 export function registerVaultTools(app: App, mcpServer: McpServer) {
   registerReadHandler(app, mcpServer);
@@ -14,4 +15,5 @@ export function registerVaultTools(app: App, mcpServer: McpServer) {
   registerVaultTreeHandler(app, mcpServer);
   registerUpsertFileHandler(app, mcpServer);
   registerUpdateMachineHandler(app, mcpServer);
+  registerUpdateUserHandler(app, mcpServer);
 }
