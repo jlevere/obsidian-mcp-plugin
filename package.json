@@ -51,6 +51,7 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "glob-to-regexp": "^0.4.1",
+    "js-yaml": "^4.1.0",
     "json-logic-js": "^2.0.5",
     "markdown-patch": "^0.2.2",
     "matcher": "^5.0.0",

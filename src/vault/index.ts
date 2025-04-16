@@ -5,6 +5,7 @@ import { registerDiffEditHandler } from "./diff-edit";
 import { registerFuzzySearchHandler } from "./fuzzy-search";
 import { registerVaultTreeHandler } from "./tree";
 import { registerUpsertFileHandler } from "./upsert";
+import { registerUpdateMachineHandler } from "./update-machine";
 
 export function registerVaultTools(app: App, mcpServer: McpServer) {
   registerReadHandler(app, mcpServer);
@@ -12,4 +13,5 @@ export function registerVaultTools(app: App, mcpServer: McpServer) {
   registerFuzzySearchHandler(app, mcpServer);
   registerVaultTreeHandler(app, mcpServer);
   registerUpsertFileHandler(app, mcpServer);
+  registerUpdateMachineHandler(app, mcpServer);
 }
