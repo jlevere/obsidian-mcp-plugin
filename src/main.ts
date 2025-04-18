@@ -3,6 +3,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import express from "express";
 import * as http from "http";
+import * as fs from 'fs';
 
 import { registerVaultTools } from "./vault";
 import { registerResources } from "./resources";
@@ -117,8 +118,7 @@ export default class ObsidianMcpPlugin extends Plugin {
         error
       );
       new Notice(
-        `Error setting up Express and ${PLUGIN_NAME} server: ${
-          (error as Error).message
+        `Error setting up Express and ${PLUGIN_NAME} server: ${(error as Error).message
         }`
       );
     }

@@ -9,6 +9,7 @@ import { registerUpdateMachineHandler } from "./update-machine";
 import { registerUpdateUserHandler } from "./update-user";
 import { registerUpdateClientHandler } from "./update-client";
 import { registerUpdateDomainHandler } from "./update-domain";
+import { registerGetSchemasHandler } from "./get-schemas";
 
 export function registerVaultTools(app: App, mcpServer: McpServer) {
   registerReadHandler(app, mcpServer);
@@ -20,4 +21,5 @@ export function registerVaultTools(app: App, mcpServer: McpServer) {
   registerUpdateUserHandler(app, mcpServer);
   registerUpdateClientHandler(app, mcpServer);
   registerUpdateDomainHandler(app, mcpServer);
+  registerGetSchemasHandler(app, mcpServer);
 }
