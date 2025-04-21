@@ -1,4 +1,4 @@
-import { App, TFile, normalizePath, MetadataCache } from 'obsidian';
+import { App, TFile, TFolder, normalizePath, MetadataCache } from 'obsidian';
 import yaml from 'js-yaml';
 
 /**
@@ -21,6 +21,36 @@ export async function ensureDirectoryExists(app: App, dirPath: string): Promise<
     }
     console.log(`Directory already exists (ignoring creation error): ${normalizedDirPath}`);
   }
+}
+
+/**
+ * Finds a TFile by its normalized path, performing a case-insensitive comparison.
+ * More reliable than getAbstractFileByPath across different filesystems and potential casing issues.
+ *
+ * @param app Obsidian App instance
+ * @param normalizedPath The normalized path to search for (case will be ignored in comparison)
+ * @returns The TFile if found, otherwise null.
+ */
+export function findFileCaseInsensitive(app: App, normalizedPath: string): TFile | null {
+  const lowerCasePath = normalizedPath.toLowerCase();
+  // Get all files (including non-markdown, just in case)
+  const files = app.vault.getFiles();
+
+  for (const file of files) {
+    // Compare lowercased normalized paths
+    if (file.path.toLowerCase() === lowerCasePath) {
+      // Ensure it's actually a TFile instance before returning
+      if (file instanceof TFile) {
+        return file;
+      } else {
+        // Log if we found a match but it's not a TFile (e.g., TFolder)
+        console.warn(`Path matched '${normalizedPath}' but it's not a TFile:`, file);
+        return null; // Treat folders or other AbstractFile types as not found for this purpose
+      }
+    }
+  }
+  // No match found
+  return null;
 }
 
 /**
