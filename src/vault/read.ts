@@ -1,7 +1,7 @@
 import { App, TFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-//import { getFileMetadataObject } from "../utils/helpers";
+import { findFileCaseInsensitive } from "../utils/obsidian-crud-utils";
 
 const description = `
 Reads the content of a file from the Obsidian vault.
@@ -19,8 +19,8 @@ export function registerReadHandler(app: App, mcpServer: McpServer) {
     async ({ path }) => {
       try {
         const normPath = normalizePath(path);
-        const file = app.vault.getAbstractFileByPath(normPath);
-        if (!file || !(file instanceof TFile)) {
+        const file = findFileCaseInsensitive(app, normPath);
+        if (!file) {
           return {
             content: [{ type: "text", text: `File not found: ${normPath}` }],
             isError: true,
