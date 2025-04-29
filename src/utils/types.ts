@@ -1,8 +1,30 @@
-import { TFile, CachedMetadata, FileStats } from "obsidian";
+import { App, FileStats } from "obsidian";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+
+export interface ToolConfig {
+  enabled: boolean;
+  description: string;
+  type: 'static' | 'dynamic' | 'resource';
+}
 
 export interface ObsidianMcpSettings {
   port: number;
   bindingHost: string;
+  disabledTools: string[];
+  enableDynamicTools: boolean;
+  dynamicToolsPath: string;
+}
+
+export interface ServerConfig {
+  port: number;
+  bindingHost: string;
+}
+
+export interface ToolRegistration {
+  name: string;
+  description: string;
+  type: 'static' | 'dynamic' | 'resource';
+  register: (app: any, mcpServer: any) => void;
 }
 
 export interface FileMetadataObject {
@@ -29,4 +51,10 @@ export interface SearchResponseItem {
 export interface HeadingBoundary {
   start: { line: number; col: number };
   end?: { line: number; col: number };
+}
+
+type ToolRegistrationFn = (app: App, mcpServer: McpServer) => void;
+
+export interface ToolRegistry {
+  readonly [key: string]: ToolRegistrationFn;
 }
