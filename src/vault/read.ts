@@ -1,12 +1,13 @@
 import { App, TFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { findFileCaseInsensitive } from "../utils/obsidian-crud-utils";
+import { findSimilarFiles } from "../utils/helpers";
 
 const description = `
 Reads the content of a file from the Obsidian vault.
 The file path should be relative to the root of the vault.
 Returns the raw content of the file as plain text.
+If the exact file is not found, will suggest similar files that might match.
 `;
 
 export function registerReadHandler(app: App, mcpServer: McpServer) {
@@ -19,30 +20,57 @@ export function registerReadHandler(app: App, mcpServer: McpServer) {
     async ({ path }) => {
       try {
         const normPath = normalizePath(path);
-        const file = findFileCaseInsensitive(app, normPath);
+        const file = app.vault.getAbstractFileByPath(normPath);
+
+        // If file not found, look for similar files
         if (!file) {
+          const similarFiles = findSimilarFiles(app, normPath);
+          const suggestions =
+            similarFiles.length > 0
+              ? `\n\nDid you mean:\n${similarFiles
+                  .map((f) => `- ${f.path}`)
+                  .join("\n")}`
+              : "";
+
           return {
-            content: [{ type: "text", text: `File not found: ${normPath}` }],
+            content: [
+              {
+                type: "text",
+                text: `File not found: ${normPath}${suggestions}`,
+              },
+            ],
             isError: true,
           };
         }
 
-        const content = await app.vault.read(file);
-        //const fileMetadata = await getFileMetadataObject(app, file);
+        // Verify it's a file not a folder
+        if (!(file instanceof TFile)) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Path exists but is a folder: ${normPath}`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        // Use cachedRead for better performance since we're only displaying content
+        const content = await app.vault.cachedRead(file);
 
         return {
-          content: [
-            { type: "text", text: content },
-            //{ type: "resource", resource: { json: fileMetadata } },
-            //TODO: id like to include a reference to a resource with the file meatadata
-            // This would need to be a solid reference uri and all that as in
-            // https://modelcontextprotocol.io/specification/2025-03-26/server/tools#embedded-resources
-          ],
+          content: [{ type: "text", text: content }],
         };
       } catch (error) {
         return {
           content: [
-            { type: "text", text: `Error reading file: ${error.message}` },
+            {
+              type: "text",
+              text: `Error reading file: ${
+                error instanceof Error ? error.message : String(error)
+              }`,
+            },
           ],
           isError: true,
         };
