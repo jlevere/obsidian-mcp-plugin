@@ -1,6 +1,13 @@
 import { App, TFile, TFolder, normalizePath } from 'obsidian';
 import yaml from 'js-yaml';
 
+// Define the structure for items within an array field
+export interface SchemaFieldItems {
+  type: 'string' | 'number' | 'boolean' | 'object' | 'array'; // Added 'object', 'array'
+  properties?: Record<string, any>; // For items type 'object'
+  items?: SchemaFieldItems; // For items type 'array' (recursive definition for nested arrays)
+}
+
 // Define the structure for a single field within a schema
 export interface SchemaFieldDefinition {
   name: string;
@@ -8,7 +15,7 @@ export interface SchemaFieldDefinition {
   description: string;
   optional: boolean;
   default?: any; // Default value (type consistency check needed later)
-  items?: { type: string }; // For type: 'array'
+  items?: SchemaFieldItems; // Use the new interface
   properties?: Record<string, any>; // For type: 'object' (simplified for now)
 }
 

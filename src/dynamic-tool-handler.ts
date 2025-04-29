@@ -9,6 +9,153 @@ import {
   findFileCaseInsensitive // Assuming this will be added/available
 } from "./utils/obsidian-crud-utils"; // Import CRUD utils
 
+// Helper defined *before* processFieldToZod to handle recursive structure
+function generateShapeFromSchemaProperties(properties: Record<string, any>, parentFieldName: string): z.ZodRawShape {
+  const shape: z.ZodRawShape = {};
+  if (!properties || typeof properties !== 'object') {
+    console.warn(`Invalid 'properties' provided for field '${parentFieldName}'. Expected an object.`);
+    return {}; // Return empty shape for invalid properties
+  }
+
+  for (const propName in properties) {
+    if (Object.prototype.hasOwnProperty.call(properties, propName)) {
+      const propDefinition = properties[propName];
+
+      // Validate the structure of the property definition
+      if (propDefinition && typeof propDefinition === 'object' && typeof propDefinition.type === 'string') {
+        // Construct a SchemaFieldDefinition-like object for processFieldToZod
+        // We cast 'type' assuming it's one of the known types; Zod validation will catch issues later.
+        const fieldDefinition: SchemaFieldDefinition = {
+          name: propName,
+          type: propDefinition.type as SchemaFieldDefinition['type'],
+          description: propDefinition.description || `Property ${propName}`,
+          optional: propDefinition.optional === true, // Defaults to false if undefined/not true
+          default: propDefinition.default,
+          items: propDefinition.items,
+          properties: propDefinition.properties
+        };
+        // Call processFieldToZod (defined below) to get the Zod type for this property
+        shape[propName] = processFieldToZod(fieldDefinition);
+      } else {
+        console.warn(`Invalid property definition for '${propName}' in properties of '${parentFieldName}'. Skipping.`);
+        // Optionally add z.any() as a fallback:
+        // shape[propName] = z.any().describe(`Skipped invalid property: ${propName}`);
+      }
+    }
+  }
+  return shape;
+}
+
+// Helper defined *after* generateShapeFromSchemaProperties
+function processFieldToZod(field: SchemaFieldDefinition): z.ZodType<any, any, any> {
+  let fieldSchema: z.ZodType<any, any, any>;
+
+  switch (field.type) {
+    case 'string':
+      fieldSchema = z.string();
+      break;
+    case 'number':
+      fieldSchema = z.number();
+      break;
+    case 'boolean':
+      fieldSchema = z.boolean();
+      break;
+    case 'date':
+      // Allow empty strings/null/undefined to clear the date, otherwise expect ISO8601
+      fieldSchema = z.preprocess(
+        (val) => (val === "" || val === null || val === undefined ? undefined : val),
+        z.string().datetime({ message: `Invalid ISO8601 datetime string for ${field.name}` })
+      );
+      break;
+    case 'array':
+      const items = field.items;
+      if (!items || !items.type) {
+        console.warn(`Array field '${field.name}' is missing 'items' definition or item 'type'. Defaulting to array of any.`);
+        fieldSchema = z.array(z.any());
+      } else {
+        switch (items.type) {
+          case 'string': fieldSchema = z.array(z.string()); break;
+          case 'number': fieldSchema = z.array(z.number()); break;
+          case 'boolean': fieldSchema = z.array(z.boolean()); break;
+          case 'object':
+            // Check if properties exist for the object items
+            if (items.properties && typeof items.properties === 'object') {
+              // Generate the shape for the objects within the array
+              const itemShape = generateShapeFromSchemaProperties(items.properties, `${field.name} items`);
+              fieldSchema = z.array(z.object(itemShape));
+            } else {
+              console.warn(`Array field '${field.name}' has item type 'object' but invalid/missing 'properties'. Defaulting to array of record<string, any>.`);
+              // Fallback for object arrays without defined properties
+              fieldSchema = z.array(z.record(z.any()));
+            }
+            break;
+          // Handling nested arrays (array within an array's items) - currently limited
+          case 'array':
+            console.warn(`Nested arrays (array within array items) are not fully supported yet for field '${field.name}'. Defaulting outer array to array of any.`);
+            fieldSchema = z.array(z.any()); // Fallback for nested arrays
+            break;
+          default:
+            // Handle unknown item types
+            console.warn(`Unsupported array item type '${items.type}' for field '${field.name}'. Defaulting to array of any.`);
+            fieldSchema = z.array(z.any());
+        }
+      }
+      break; // End case 'array'
+    case 'object':
+      // Check if properties exist for the object field
+      if (field.properties && typeof field.properties === 'object') {
+        // Generate the shape for the object's properties
+        const shape = generateShapeFromSchemaProperties(field.properties, field.name);
+        fieldSchema = z.object(shape);
+      } else {
+        console.warn(`Object field '${field.name}' has invalid/missing 'properties'. Defaulting to record of any.`);
+        // Fallback for object fields without defined properties
+        fieldSchema = z.record(z.any());
+      }
+      break;
+    default:
+      // Handle unknown field types specified in the schema
+      console.warn(`Unsupported field type '${field.type}' for field '${field.name}'. Defaulting to z.string().`);
+      fieldSchema = z.string();
+  }
+
+  // Apply optional modifier AFTER defining the base type
+  if (field.optional) {
+    if (field.default !== undefined) {
+      try {
+        // Validate default value type consistency before applying .default()
+        if (field.type === 'array' && !Array.isArray(field.default)) {
+          console.warn(`Default value for array field '${field.name}' is not an array. Applying .optional() without default.`);
+          fieldSchema = fieldSchema.optional();
+        } else if (field.type === 'date') {
+          // Avoid defaulting date types automatically unless specifically intended
+          console.warn(`Default value provided for date field '${field.name}'. Applying .optional() without default. Handle defaults explicitly if needed.`);
+          fieldSchema = fieldSchema.optional();
+        }
+        // TODO: Add consistency check for object defaults if needed
+        // else if (field.type === 'object' && (typeof field.default !== 'object' || field.default === null || Array.isArray(field.default))) { ... }
+        else {
+          // Apply default if type seems consistent
+          fieldSchema = fieldSchema.optional().default(field.default);
+        }
+      } catch (e) {
+        // Catch errors during .default() application (e.g., Zod type mismatch)
+        console.error(`Error applying default value for field '${field.name}'. Default: ${JSON.stringify(field.default)}, Type: ${field.type}. Error: ${e instanceof Error ? e.message : String(e)}. Applying .optional() without default.`);
+        fieldSchema = fieldSchema.optional(); // Fallback to optional only
+      }
+    } else {
+      // Optional without a default value
+      fieldSchema = fieldSchema.optional();
+    }
+  }
+
+  // Apply description, using field name as fallback
+  fieldSchema = fieldSchema.describe(field.description || field.name);
+
+  return fieldSchema;
+}
+
+
 /**
  * Generates a Zod schema RAW SHAPE object based on a parsed SchemaDefinition.
  * @param definition The schema definition parsed from YAML.
@@ -20,98 +167,24 @@ export function generateZodSchema(definition: SchemaDefinition): z.ZodRawShape {
   // 1. Add required path components as required string inputs
   for (const component of definition.pathComponents) {
     // Ensure path components don't clash with actual fields, maybe prefix?
-    // For now, assume they are distinct top-level inputs.
+    // For now, assume they are distinct top-level inputs. Prefixing or checking later might be needed.
+    if (zodSchemaDefinition[component]) {
+      console.warn(`Path component name '${component}' conflicts with another path component. Overwriting.`);
+    }
     zodSchemaDefinition[component] = z.string().describe(`Required path component: ${component}`);
   }
 
-  // 2. Add fields from the schema definition
+  // 2. Add fields from the schema definition using the helper function
   for (const field of definition.fields) {
-    let fieldSchema: z.ZodType<any, any, any>;
+    // Get the Zod type for the current field using the processing helper
+    const fieldSchema = processFieldToZod(field);
 
-    switch (field.type) {
-      case 'string':
-        fieldSchema = z.string();
-        break;
-      case 'number':
-        fieldSchema = z.number();
-        break;
-      case 'boolean':
-        fieldSchema = z.boolean();
-        break;
-      case 'date':
-        // Use preprocess for flexibility, allowing empty strings or actual dates
-        fieldSchema = z.preprocess(
-          (val) => (val === "" || val === null || val === undefined ? undefined : val), // Allow clearing date? Maybe require ISO string?
-          z.string().datetime({ message: `Invalid ISO8601 datetime string for ${field.name}` })
-        );
-        // Do not apply default here for 'date' type if it's 'last_modified' or similar auto-field
-        // Defaulting dates might be complex, handle via 'optional' + auto-set logic
-        break;
-      case 'array':
-        // Basic array handling - assumes array of strings for now based on example
-        // Needs refinement for arrays of objects or other types based on `field.items`
-        if (field.items?.type === 'string') {
-          fieldSchema = z.array(z.string());
-        } else if (field.items?.type === 'number') {
-          fieldSchema = z.array(z.number());
-        } else if (field.items?.type === 'boolean') {
-          fieldSchema = z.array(z.boolean());
-        } else {
-          // Default to array of strings or maybe z.any() if item type is complex/unknown
-          console.warn(`Unsupported array item type '${field.items?.type}' for field '${field.name}'. Defaulting to array of strings.`);
-          fieldSchema = z.array(z.string());
-          // TODO: Handle array of objects based on field.items.properties if needed
-        }
-        break;
-      case 'object':
-        // Basic object handling - allows any object structure
-        // TODO: Recursively generate schema based on field.properties if needed
-        fieldSchema = z.record(z.any()); // Or z.object({}).passthrough();
-        break;
-      default:
-        console.warn(`Unsupported field type '${field.type}' for field '${field.name}'. Defaulting to z.string().`);
-        fieldSchema = z.string(); // Default to string for unknown types
-    }
-
-    // Apply optional modifier if applicable
-    if (field.optional) {
-      // If a default value is provided, apply it along with optional()
-      if (field.default !== undefined) {
-        // Need careful type casting/validation for default values
-        try {
-          // Attempt to apply default. Zod will validate type consistency.
-          // For arrays, ensure the default is an array. For dates, default might be tricky.
-          if (field.type === 'array' && !Array.isArray(field.default)) {
-            console.warn(`Default value for array field '${field.name}' is not an array. Ignoring default.`);
-            fieldSchema = fieldSchema.optional();
-          } else if (field.type === 'date' && field.default !== undefined) {
-            // Generally avoid defaulting 'date' types like last_modified
-            console.warn(`Default value provided for date field '${field.name}'. Ignoring default; use optional only.`);
-            fieldSchema = fieldSchema.optional();
-          }
-          else {
-            fieldSchema = fieldSchema.optional().default(field.default);
-          }
-        } catch (e) {
-          console.error(`Error applying default value for field '${field.name}'. Default: ${field.default}, Type: ${field.type}. Error: ${e instanceof Error ? e.message : String(e)}`);
-          fieldSchema = fieldSchema.optional(); // Fallback to just optional if default fails
-        }
-
-      } else {
-        fieldSchema = fieldSchema.optional();
-      }
-    }
-
-    // Add description
-    fieldSchema = fieldSchema.describe(field.description);
-
-    // Add the field schema to the main definition object
-    // Ensure field names don't clash with path components (could happen if schema reuses names)
+    // Add the processed field schema to the main definition object, checking for conflicts
     if (zodSchemaDefinition[field.name]) {
-      console.warn(`Field name '${field.name}' conflicts with a path component. Path component definition will be used.`);
-    } else {
-      zodSchemaDefinition[field.name] = fieldSchema;
+      // Log conflict if a field name clashes with a path component or another field (though field clashes shouldn't happen if schema is valid)
+      console.warn(`Field name '${field.name}' conflicts with a path component or another field. The previous definition (likely path component) will be overwritten by the field definition.`);
     }
+    zodSchemaDefinition[field.name] = fieldSchema;
   }
 
   // Return the raw shape object directly
