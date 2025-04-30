@@ -15,6 +15,8 @@ way for applications to interact with your vault.
 [Development](#development) •
 [Schema Guide](#schema-guide)
 
+![obsidian-settings](./docs/obsidian-settings.png)
+
 </div>
 
 ## Features
@@ -27,6 +29,8 @@ way for applications to interact with your vault.
   - Fuzzy search across your vault
   - Navigate vault structure programmatically
 - **Configurable:** Customize server settings and tool availability
+
+![tool-selection](./docs/obsidian-settings-tools.png)
 
 ## Installation
 

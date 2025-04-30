@@ -34,12 +34,12 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     // Server Settings
     this.displayServerSettings(containerEl);
 
-    // Dynamic Tools Settings
-    this.displayDynamicToolsSettings(containerEl);
-
     // Tools and Resources Sections
     this.displayToolsSection(containerEl);
     this.displayResourcesSection(containerEl);
+
+    // Dynamic Tools Settings
+    this.displayDynamicToolsSettings(containerEl);
 
     // Restart Server Button
     new Setting(containerEl)
