@@ -1,16 +1,16 @@
-import { App, prepareFuzzySearch } from "obsidian";
+import { App, prepareFuzzySearch, TFile } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { SearchResponseItem } from "src/utils/types";
+import { SearchResponseItem } from "../utils/types";
 
-const description = `
-Searches the contents of the files in the vault for a given string. Returns the matching filenames and scores.
+export const description = `
+Performs a fuzzy search across all files in the vault.
 
-Each result includes:
-- filename: the full path of the file in the vault
-- score: a fuzzy match score (lower is better)
+The search query can be a partial match and will return files that best match the query.
+Results are sorted by relevance.
 
-Output is sorted by relevance and limited to the specified maximum (default: 5).
+Returns:
+- files: Array of matching file paths
 `;
 
 export function registerFuzzySearchHandler(app: App, mcpServer: McpServer) {

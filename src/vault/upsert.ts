@@ -2,7 +2,7 @@ import { App, TFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-const description = `
+export const description = `
 Upserts a file in the vault. If the file doesn't exist, it is created with the provided content.
 If it exists, the provided content is appended to the end of the file.  The path will be normalized.
 

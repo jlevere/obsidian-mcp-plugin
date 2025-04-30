@@ -2,7 +2,7 @@ import { App, TFile, TFolder, TAbstractFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-const description = `
+export const description = `
 Returns a hierarchical tree representation of a directory in the Obsidian vault.
 If a directory path is provided via "dir", the tree is built for that directory.
 If no path is provided, the vault root is used.

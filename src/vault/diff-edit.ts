@@ -7,7 +7,7 @@ import {
   stringifyPatches,
 } from "@sanity/diff-match-patch";
 
-const description = `
+export const description = `
 Applies a smart diff to a file in the vault by comparing the current file contents with the full updated version you provide.
 
 The input "changes" should be the full intended contents of the file. The system will compute and apply only the minimal necessary edits.
