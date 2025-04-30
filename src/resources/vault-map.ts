@@ -1,10 +1,10 @@
-import { App, TFile, TFolder, TAbstractFile } from "obsidian";
+import { App } from "obsidian";
 import {
   McpServer,
   ResourceTemplate,
   ResourceMetadata,
 } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { getFileMetadataObject } from "../utils/helpers";
+import { buildVaultTree } from "../utils/helpers";
 
 const resourceUri = "vault://map";
 const resourceName = "Vault Map";
@@ -21,41 +21,17 @@ export function registerVaultMapResource(app: App, mcpServer: McpServer) {
   mcpServer.resource(resourceName, resourceUri, metadata, async (uri) => {
     try {
       const root = app.vault.getRoot();
+      const tree = await buildVaultTree(app, root, { includeMetadata: true });
 
-      async function buildTree(file: TAbstractFile, depth = 0): Promise<any> {
-        if (file instanceof TFile) {
-          const metadata = await getFileMetadataObject(app, file);
-          return {
-            name: file.name,
-            type: "file",
-            path: file.path,
-            size: file.stat.size,
-            modified: file.stat.mtime,
-            tags: metadata.tags,
-            frontmatter: metadata.frontmatter,
-          };
-        } else if (file instanceof TFolder) {
-          const children = await Promise.all(
-            file.children.map((child) => buildTree(child, depth + 1))
-          );
-          return {
-            name: file.name,
-            type: "folder",
-            path: file.path,
-            children,
-          };
-        }
-        return null;
+      if (!tree) {
+        throw new Error("Failed to build vault tree");
       }
-
-      const tree = await buildTree(root);
-      const content = JSON.stringify(tree, null, 2);
 
       return {
         contents: [
           {
             uri: uri.href,
-            text: content,
+            text: JSON.stringify(tree, null, 2),
           },
         ],
       };

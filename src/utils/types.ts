@@ -4,7 +4,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 export interface ToolConfig {
   enabled: boolean;
   description: string;
-  type: 'static' | 'dynamic' | 'resource';
+  type: "static" | "dynamic" | "resource";
 }
 
 export interface ObsidianMcpSettings {
@@ -23,7 +23,7 @@ export interface ServerConfig {
 export interface ToolRegistration {
   name: string;
   description: string;
-  type: 'static' | 'dynamic' | 'resource';
+  type: "static" | "dynamic" | "resource";
   register: (app: any, mcpServer: any) => void;
 }
 
@@ -57,4 +57,30 @@ type ToolRegistrationFn = (app: App, mcpServer: McpServer) => void;
 
 export interface ToolRegistry {
   readonly [key: string]: ToolRegistrationFn;
+}
+
+export interface BaseTreeNode {
+  name: string;
+  type: "file" | "folder";
+  path: string;
+}
+
+export interface FileTreeNode extends BaseTreeNode {
+  type: "file";
+  size: number;
+  modified: number;
+  tags?: string[];
+  frontmatter?: Record<string, unknown>;
+}
+
+export interface FolderTreeNode extends BaseTreeNode {
+  type: "folder";
+  children: TreeNode[];
+}
+
+export type TreeNode = FileTreeNode | FolderTreeNode;
+
+export interface TreeBuildOptions {
+  includeMetadata?: boolean;
+  maxDepth?: number;
 }

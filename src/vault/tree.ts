@@ -1,6 +1,7 @@
-import { App, TFile, TFolder, TAbstractFile, normalizePath } from "obsidian";
+import { App, TFolder, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { buildVaultTree } from "../utils/helpers";
 
 export const description = `
 Returns a hierarchical tree representation of a directory in the Obsidian vault.
@@ -22,48 +23,47 @@ export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
         ),
       depth: z
         .number()
+        .int()
+        .min(0)
         .optional()
+        .transform((val) => val ?? Infinity)
         .describe(
-          "Recursion level for subfolders. Use 0 to return only the current folder, 1 to include immediate children, etc. Defaults to full recursion if omitted."
+          "Recursion level for subfolders. Use 0 to return only the current folder, 1 to include immediate children, etc. Defaults to full recursion."
         ),
     },
     async ({ dir, depth }) => {
-      const maxDepth = typeof depth === "number" ? depth : Infinity;
       try {
-        let target: TAbstractFile;
-        if (dir) {
-          const normalizedDir = normalizePath(dir);
-          target = app.vault.getAbstractFileByPath(normalizedDir);
-          if (!target || !(target instanceof TFolder)) {
-            return {
-              content: [
-                {
-                  type: "text",
-                  text: `Directory not found or is not a folder: ${normalizedDir}`,
-                },
-              ],
-              isError: true,
-            };
-          }
-        } else {
-          target = app.vault.getRoot();
+        const target = dir
+          ? app.vault.getAbstractFileByPath(normalizePath(dir))
+          : app.vault.getRoot();
+
+        if (!target || !(target instanceof TFolder)) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Directory not found or is not a folder: ${normalizePath(
+                  dir || "/"
+                )}`,
+              },
+            ],
+            isError: true,
+          };
         }
 
-        function buildTree(file: TAbstractFile, depth: number): any {
-          if (file instanceof TFile) {
-            return { name: file.name, type: "file" };
-          } else if (file instanceof TFolder) {
-            if (depth === 0) {
-              return { name: file.name, type: "folder" };
-            }
-            const children = file.children.map((child) =>
-              buildTree(child, depth - 1)
-            );
-            return { name: file.name, type: "folder", children };
-          }
-        }
+        const tree = await buildVaultTree(app, target, { maxDepth: depth });
 
-        const tree = buildTree(target, maxDepth);
+        if (!tree) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Failed to build tree for: ${normalizePath(dir || "/")}`,
+              },
+            ],
+            isError: true,
+          };
+        }
 
         return {
           content: [
@@ -73,12 +73,14 @@ export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
             },
           ],
         };
-      } catch (error: any) {
+      } catch (error) {
         return {
           content: [
             {
               type: "text",
-              text: `Error building directory tree: ${error.message}`,
+              text: `Error building directory tree: ${
+                error instanceof Error ? error.message : String(error)
+              }`,
             },
           ],
           isError: true,
