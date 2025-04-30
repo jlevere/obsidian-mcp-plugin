@@ -1,12 +1,28 @@
-import { App, PluginSettingTab, Setting, Notice } from "obsidian";
+import { App, PluginSettingTab, Setting, Notice, debounce } from "obsidian";
 import ObsidianMcpPlugin from "./main";
+import { VAULT_TOOLS, TOOL_DESCRIPTIONS } from "./vault/index";
+import { VAULT_RESOURCES, RESOURCE_DESCRIPTIONS } from "./resources";
 
 export class ObsidianMcpSettingTab extends PluginSettingTab {
   plugin: ObsidianMcpPlugin;
+  private debouncedSave: (value: string) => void;
 
   constructor(app: App, plugin: ObsidianMcpPlugin) {
     super(app, plugin);
     this.plugin = plugin;
+
+    // Create debounced save function that waits 2 seconds after last change
+    this.debouncedSave = debounce(
+      async (value: string) => {
+        this.plugin.settings.dynamicToolsPath = value;
+        await this.plugin.saveSettings();
+        new Notice(
+          "Schema path changed. Please restart the server to apply changes."
+        );
+      },
+      2000,
+      true
+    );
   }
 
   display(): void {
@@ -16,6 +32,27 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     containerEl.createEl("h2", { text: "Obsidian MCP Plugin Settings" });
 
     // Server Settings
+    this.displayServerSettings(containerEl);
+
+    // Dynamic Tools Settings
+    this.displayDynamicToolsSettings(containerEl);
+
+    // Tools and Resources Sections
+    this.displayToolsSection(containerEl);
+    this.displayResourcesSection(containerEl);
+
+    // Restart Server Button
+    new Setting(containerEl)
+      .setName("Restart Server")
+      .setDesc("Restart the MCP server to apply changes")
+      .addButton((button) =>
+        button.setButtonText("Restart Server").onClick(async () => {
+          await this.plugin.restartServer();
+        })
+      );
+  }
+
+  private displayServerSettings(containerEl: HTMLElement): void {
     containerEl.createEl("h3", { text: "Server Settings" });
 
     new Setting(containerEl)
@@ -49,8 +86,9 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+  }
 
-    // Dynamic Tools Settings
+  private displayDynamicToolsSettings(containerEl: HTMLElement): void {
     containerEl.createEl("h3", { text: "Dynamic Tools" });
 
     new Setting(containerEl)
@@ -62,7 +100,9 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.enableDynamicTools = value;
             await this.plugin.saveSettings();
-            new Notice("Dynamic tools setting changed. Please restart the server to apply changes.");
+            new Notice(
+              "Dynamic tools setting changed. Please restart the server to apply changes."
+            );
           })
       );
 
@@ -73,61 +113,54 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
         text
           .setPlaceholder("metadata/schemas")
           .setValue(this.plugin.settings.dynamicToolsPath)
-          .onChange(async (value) => {
-            this.plugin.settings.dynamicToolsPath = value;
-            await this.plugin.saveSettings();
-            new Notice("Schema path changed. Please restart the server to apply changes.");
+          .onChange((value: string) => {
+            this.debouncedSave(value);
           })
-      );
-
-    // Tool Settings
-    containerEl.createEl("h3", { text: "Available Tools" });
-
-    // Get available tools from the tool manager
-    const availableTools = this.plugin.toolManager.getAvailableTools();
-
-    // Display tools
-    if (availableTools.length > 0) {
-      for (const toolName of availableTools) {
-        new Setting(containerEl)
-          .setName(toolName)
-          .setDesc(this.getToolDescription(toolName))
-          .addToggle((toggle) =>
-            toggle
-              .setValue(this.plugin.toolManager.isToolEnabled(toolName))
-              .onChange(async (value) => {
-                this.plugin.toolManager.setToolEnabled(toolName, value);
-                this.plugin.settings.disabledTools = this.plugin.toolManager.getDisabledTools();
-                await this.plugin.saveSettings();
-                new Notice("Tool settings changed. Please restart the server to apply changes.");
-              })
-          );
-      }
-    }
-
-    new Setting(containerEl)
-      .setName("Restart Server")
-      .setDesc("Restart the MCP server to apply changes")
-      .addButton((button) =>
-        button.setButtonText("Restart Server").onClick(async () => {
-          await this.plugin.restartServer();
-        })
       );
   }
 
-  private getToolDescription(toolName: string): string {
-    // Add descriptions for known tools
-    const descriptions: Record<string, string> = {
-      'read-file': 'Read file contents from the vault',
-      'diff-edit-file': 'Apply smart diffs to files',
-      'fuzzy-search': 'Search for files using fuzzy matching',
-      'vault-tree': 'Get hierarchical vault structure',
-      'upsert-file': 'Create or update files',
-      'get-schemas': 'Get available schema definitions',
-      'vault-map': 'Get complete vault structure with metadata',
-      'active-file': 'Get information about the currently active file'
-    };
+  private createToggleSetting(
+    containerEl: HTMLElement,
+    name: string,
+    description: string
+  ) {
+    new Setting(containerEl)
+      .setName(name)
+      .setDesc(description)
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.toolManager.isToolEnabled(name))
+          .onChange(async (value) => {
+            this.plugin.toolManager.setToolEnabled(name, value);
+            this.plugin.settings.disabledTools =
+              this.plugin.toolManager.getDisabledTools();
+            await this.plugin.saveSettings();
+            new Notice(
+              `Settings changed. Please restart the server to apply changes.`
+            );
+          })
+      );
+  }
 
-    return descriptions[toolName] || 'Tool for vault interaction';
+  private displayToolsSection(containerEl: HTMLElement): void {
+    const toolsContainer = containerEl.createDiv();
+    toolsContainer.createEl("h3", { text: "Available Tools" });
+
+    Object.keys(VAULT_TOOLS).forEach((toolName) => {
+      const description =
+        TOOL_DESCRIPTIONS[toolName] ?? "No description available";
+      this.createToggleSetting(toolsContainer, toolName, description);
+    });
+  }
+
+  private displayResourcesSection(containerEl: HTMLElement): void {
+    const resourcesContainer = containerEl.createDiv();
+    resourcesContainer.createEl("h3", { text: "Available Resources" });
+
+    Object.keys(VAULT_RESOURCES).forEach((resourceName) => {
+      const description =
+        RESOURCE_DESCRIPTIONS[resourceName] ?? "No description available";
+      this.createToggleSetting(resourcesContainer, resourceName, description);
+    });
   }
 }
