@@ -67,9 +67,9 @@ way for applications to interact with your vault.
 
 ### Prerequisites
 
-- Node.js >= 22.14.0
-- pnpm >= 10.8.0
-- Basic knowledge of TypeScript and Obsidian API
+- Basic knowledge of TypeScript and [Obsidian API](https://github.com/obsidianmd/obsidian-api)
+
+A nix flake is provided to create a standarized development environment.
 
 ### Setup Development Environment
 
@@ -119,7 +119,13 @@ pnpm run package
 
 The plugin supports structured data through JSON Schema-based definitions. This enables type-safe note creation and validation.
 
-### Creating a Schema
+This allows llms to create and update structured data without breaking it.
+
+In an essense, you describe a document and interface using yaml which is converted to jsonschema, validated, and used to generate zod interfaces for MCP tools.
+
+`yaml -> jsonschema -> zod -> MCP tool`
+
+### Examples
 
 Create a new markdown file in your schema directory (default: `metadata/schemas`) with a YAML schema block:
 
@@ -198,25 +204,19 @@ When you use it to put data into obsidan the result looks like this:
 Schemas are validated against:
 
 1. JSON Schema specification (draft-07)
-2. Plugin's [meta-schema](./src/structured-tools/meta-schema.json) for additional requirements
+2. Plugin's [meta-schema](./src/structured-tools/meta-schema.json) for compliance with structure and zod types
 
-### Supported Field Types
+### Writing your own schemas
 
-- `string`: Text values
-- `number`: Numeric values
-- `boolean`: True/false values
-- `date`: Date values
-- `array`: Lists of items
-- `object`: Nested objects
-- `enum`: Predefined options
+There are two parts to the schemas.
 
-### Using Schemas
+The `metadata` section, which describes the name of the file, the location, and importantly, what keys are used as identifiers.
 
-Schemas can be used through:
+The `fields` section, this describes your actual document. It will be represented as a yaml like document and stored in markdown. Obsidian is able to render this yaml like document and nicely embed it.
 
-1. MCP tools for programmatic note creation
-2. Template suggestions in Obsidian
-3. Validation of existing notes
+The `fields` section is used to generate the `zod` schema which creates the MCP tool interface. So, you are simultainiously defining your data and also the interface to interact with it.
+
+This gives you access to many of `zods` features though, such as `minimum`/`maximum` `default` etc.
 
 ## Contributing
 
