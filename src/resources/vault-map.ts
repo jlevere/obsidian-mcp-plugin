@@ -4,7 +4,7 @@ import {
   ResourceTemplate,
   ResourceMetadata,
 } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { getFileMetadataObject } from "src/utils/helpers";
+import { getFileMetadataObject } from "../utils/helpers";
 
 const resourceUri = "vault://map";
 const resourceName = "Vault Map";
@@ -12,7 +12,7 @@ const resourceDescription =
   "Provides a hierarchical tree representation of the Obsidian vault, including file metadata.";
 
 // Define the metadata for the resource
-const metadata: ResourceMetadata = {
+export const metadata: ResourceMetadata = {
   mimeType: "application/json",
   description: resourceDescription,
 };

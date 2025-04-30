@@ -7,7 +7,7 @@ import { getFileMetadataObject } from "../utils/helpers";
 
 const resourceUri = "metadata://active-file";
 const resourceName = "Active File";
-const metadata: ResourceMetadata = {
+export const metadata: ResourceMetadata = {
   mimeType: "application/json",
   description: "Metadata of the active File.",
 };
