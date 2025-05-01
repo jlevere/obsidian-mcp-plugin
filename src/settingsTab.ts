@@ -87,6 +87,37 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+    containerEl.createEl("h4", {
+      text: "Listening Endpoints",
+      cls: "setting-item-name",
+    });
+
+    const host = this.plugin.settings.bindingHost || "0.0.0.0";
+    const port = this.plugin.settings.port || 3000;
+    const mcpUrl = `http://${host}:${port}/mcp`;
+    const sseUrl = `http://${host}:${port}/sse`;
+
+    const createEndpointSetting = (name: string, url: string) => {
+      new Setting(containerEl)
+        .setName(name)
+        .addText(
+          (text) =>
+            (text.setValue(url).setDisabled(true).inputEl.style.width = "100%")
+        )
+        .addButton((button) =>
+          button
+            .setIcon("copy")
+            .setTooltip("Copy URL")
+            .onClick(() => {
+              navigator.clipboard.writeText(url);
+              new Notice(`${name} URL copied to clipboard!`);
+            })
+        );
+    };
+
+    createEndpointSetting("Streamable HTTP", mcpUrl);
+    createEndpointSetting("SSE", sseUrl);
   }
 
   private async displayDynamicToolsSettings(
