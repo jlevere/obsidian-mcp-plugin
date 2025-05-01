@@ -59,6 +59,19 @@ way for applications to interact with your vault.
 
 The plugin currently only supports Server-Sent Events (SSE) and StreamHTTP connections. For applications that require stdio connections (like Claude Desktop), you'll need to use a proxy. You can follow [Cloudflare's guide](https://developers.cloudflare.com/agents/guides/test-remote-mcp-server/#connect-your-remote-mcp-server-to-claude-desktop-via-a-local-proxy) on setting up a local proxy using [`mcp-remote`](https://www.npmjs.com/package/mcp-remote).
 
+Here is an example claude_desktop_config.json to use Cloudflare's local proxy.
+
+```
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "npx",
+      "args": ["mcp-remote", "http://localhost:<your_server_ip>/sse"]
+    }
+  }
+}
+```
+
 ### Available Tools
 
 - `read-file`: Get file contents
