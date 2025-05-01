@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![GitHub license](https://img.shields.io/github/license/jlevere/obsidian-mcp-plugin)](LICENSE)
+[![Test](https://github.com/jlevere/obsidian-mcp-plugin/actions/workflows/test.yml/badge.svg)](https://github.com/jlevere/obsidian-mcp-plugin/actions/workflows/test.yml)
 [![GitHub release](https://img.shields.io/github/v/release/jlevere/obsidian-mcp-plugin)](https://github.com/jlevere/obsidian-mcp-plugin/releases)
 [![Downloads](https://img.shields.io/github/downloads/jlevere/obsidian-mcp-plugin/total)](https://github.com/jlevere/obsidian-mcp-plugin/releases)
 
@@ -54,6 +54,10 @@ way for applications to interact with your vault.
 1. Enable the plugin
 2. Configure port and host in settings
 3. Restart the plugin to apply changes
+
+### Connection Methods
+
+The plugin currently only supports Server-Sent Events (SSE) and StreamHTTP connections. For applications that require stdio connections (like Claude Desktop), you'll need to use a proxy. You can follow [Cloudflare's guide](https://developers.cloudflare.com/agents/guides/test-remote-mcp-server/#connect-your-remote-mcp-server-to-claude-desktop-via-a-local-proxy) on setting up a local proxy using [`mcp-remote`](https://www.npmjs.com/package/mcp-remote).
 
 ### Available Tools
 
