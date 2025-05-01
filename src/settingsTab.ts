@@ -16,6 +16,8 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       async (value: string) => {
         this.plugin.settings.dynamicToolsPath = value;
         await this.plugin.saveSettings();
+        // Update the tool manager with new settings
+        this.plugin.toolManager.updateSettings(this.plugin.settings);
         new Notice(
           "Schema path changed. Please restart the server to apply changes."
         );
@@ -25,7 +27,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     );
   }
 
-  display(): void {
+  async display(): Promise<void> {
     const { containerEl } = this;
     containerEl.empty();
 
@@ -39,7 +41,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     this.displayResourcesSection(containerEl);
 
     // Dynamic Tools Settings
-    this.displayDynamicToolsSettings(containerEl);
+    await this.displayDynamicToolsSettings(containerEl);
 
     // Restart Server Button
     new Setting(containerEl)
@@ -48,6 +50,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       .addButton((button) =>
         button.setButtonText("Restart Server").onClick(async () => {
           await this.plugin.restartServer();
+          await this.display();
         })
       );
   }
@@ -88,7 +91,9 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       );
   }
 
-  private displayDynamicToolsSettings(containerEl: HTMLElement): void {
+  private async displayDynamicToolsSettings(
+    containerEl: HTMLElement
+  ): Promise<void> {
     containerEl.createEl("h3", { text: "Dynamic Tools" });
 
     new Setting(containerEl)
@@ -117,6 +122,36 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
             this.debouncedSave(value);
           })
       );
+
+    // Add section for displaying dynamic tools
+    if (this.plugin.settings.enableDynamicTools) {
+      const dynamicTools = await this.plugin.toolManager.getDynamicTools();
+      if (dynamicTools.length > 0) {
+        containerEl.createEl("h4", { text: "Loaded Dynamic Tools" });
+        const dynamicToolsContainer = containerEl.createDiv();
+        dynamicToolsContainer.addClasses(["setting-item-description"]);
+        dynamicToolsContainer.style.marginTop = "10px";
+        dynamicToolsContainer.style.marginLeft = "10px";
+
+        console.log(dynamicTools);
+
+        for (const toolName of dynamicTools) {
+          this.createToggleSetting(
+            dynamicToolsContainer,
+            toolName,
+            `Dynamic tool: ${toolName}`
+          );
+        }
+      } else {
+        const noToolsMsg = containerEl.createDiv();
+        noToolsMsg.addClasses(["setting-item-description"]);
+        noToolsMsg.style.marginTop = "10px";
+        noToolsMsg.style.marginLeft = "10px";
+        noToolsMsg.createSpan({
+          text: "No dynamic tools found in the schema directory.",
+        });
+      }
+    }
   }
 
   private createToggleSetting(
