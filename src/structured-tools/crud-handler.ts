@@ -65,19 +65,17 @@ export async function handleStructuredUpdate(
       );
     }
 
+    // Normalize path and ensure .md extension
     targetPath = normalizePath(targetPath);
-    if (!targetPath.toLowerCase().endsWith(".md")) {
+    if (!targetPath.endsWith(".md")) {
       targetPath += ".md";
     }
 
     // 3. Prepare data with metadata
-    const dataToSave = {
-      ...inputArgs,
-    };
+    let dataToSave: Record<string, unknown> = { ...inputArgs };
 
     // 4. Handle file operations
     const file = app.vault.getAbstractFileByPath(targetPath);
-    const yamlContent = "---\n" + yaml.dump(dataToSave) + "---\n";
 
     if (!file) {
       // Create new file with directory structure
@@ -86,6 +84,7 @@ export async function handleStructuredUpdate(
         await app.vault.createFolder(dir).catch(() => {}); // Ignore if exists
       }
 
+      const yamlContent = "---\n" + yaml.dump(dataToSave) + "---\n";
       await app.vault.create(targetPath, yamlContent);
       return {
         content: [
@@ -116,11 +115,19 @@ export async function handleStructuredUpdate(
     let body = "";
 
     if (cache?.frontmatter && cache.frontmatterPosition) {
+      // Merge existing frontmatter with new data, preferring new data, but keeping existing keys
+      const existingData = cache.frontmatter;
+      dataToSave = {
+        ...existingData,
+        ...dataToSave,
+      };
+
       // Extract body content after frontmatter
       body = content.slice(cache.frontmatterPosition.end.offset);
     }
 
     // Generate new content with updated frontmatter
+    const yamlContent = "---\n" + yaml.dump(dataToSave) + "---\n";
     const newContent = yamlContent + (body || "\n");
     await app.vault.modify(file, newContent);
 
