@@ -83,4 +83,27 @@ ${schema.metadata.description}`,
       console.error("Error registering structured tools:", error);
     }
   }
+
+  /**
+   * Gets the list of available dynamic tools, including list-schemas and schema-based tools
+   */
+  public async getDynamicTools(): Promise<string[]> {
+    if (!this.config.enabled) {
+      return [];
+    }
+
+    const tools = ["list-schemas"];
+
+    try {
+      const schemas = await findAndParseSchemas(this.app, this.config);
+      for (const schema of schemas) {
+        const toolName = `update-${schema.metadata.schemaName.toLowerCase()}`;
+        tools.push(toolName);
+      }
+    } catch (error) {
+      console.error("Error getting dynamic tools:", error);
+    }
+
+    return tools;
+  }
 }

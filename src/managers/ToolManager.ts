@@ -91,4 +91,8 @@ export class ToolManager {
       }
     }
   }
+
+  public async getDynamicTools(): Promise<string[]> {
+    return await this.structuredManager.getDynamicTools();
+  }
 }

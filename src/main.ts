@@ -6,9 +6,9 @@ import { ServerManager } from "./managers/ServerManager";
 import { ToolManager } from "./managers/ToolManager";
 
 export default class ObsidianMcpPlugin extends Plugin {
-  private settings: ObsidianMcpSettings;
+  settings: ObsidianMcpSettings;
+  toolManager: ToolManager;
   private serverManager: ServerManager;
-  private toolManager: ToolManager;
   private isRestarting = false;
   private isInitialized = false;
 
