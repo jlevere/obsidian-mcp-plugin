@@ -29,7 +29,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h2", { text: "Obsidian MCP Plugin Settings" });
+    containerEl.createEl("h2", { text: "Obsidian MCP" });
 
     // Server Settings
     this.displayServerSettings(containerEl);

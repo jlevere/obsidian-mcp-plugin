@@ -2,6 +2,8 @@
 
 <div align="center">
 
+## UNDER ACTIVE DEVELOPMENT
+
 [![Test](https://github.com/jlevere/obsidian-mcp-plugin/actions/workflows/test.yml/badge.svg)](https://github.com/jlevere/obsidian-mcp-plugin/actions/workflows/test.yml)
 [![GitHub release](https://img.shields.io/github/v/release/jlevere/obsidian-mcp-plugin)](https://github.com/jlevere/obsidian-mcp-plugin/releases)
 [![Downloads](https://img.shields.io/github/downloads/jlevere/obsidian-mcp-plugin/total)](https://github.com/jlevere/obsidian-mcp-plugin/releases)
@@ -61,16 +63,18 @@ The plugin currently only supports Server-Sent Events (SSE) and StreamHTTP conne
 
 Here is an example claude_desktop_config.json to use Cloudflare's local proxy.
 
-```
+```json
 {
   "mcpServers": {
     "obsidian": {
       "command": "npx",
-      "args": ["mcp-remote", "http://localhost:<your_server_ip>/sse"]
+      "args": ["mcp-remote", "http://localhost:<your_server_port>/sse"]
     }
   }
 }
 ```
+
+You can find the correct url from the plugin's setting pannel under endpoints.
 
 ### Available Tools
 
