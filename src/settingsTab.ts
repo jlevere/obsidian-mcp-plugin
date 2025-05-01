@@ -11,12 +11,10 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     super(app, plugin);
     this.plugin = plugin;
 
-    // Create debounced save function that waits 2 seconds after last change
     this.debouncedSave = debounce(
       async (value: string) => {
         this.plugin.settings.dynamicToolsPath = value;
         await this.plugin.saveSettings();
-        // Update the tool manager with new settings
         this.plugin.toolManager.updateSettings(this.plugin.settings);
         new Notice(
           "Schema path changed. Please restart the server to apply changes."
@@ -123,7 +121,6 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           })
       );
 
-    // Add section for displaying dynamic tools
     if (this.plugin.settings.enableDynamicTools) {
       const dynamicTools = await this.plugin.toolManager.getDynamicTools();
       if (dynamicTools.length > 0) {

@@ -96,13 +96,16 @@ ${schema.metadata.description}`,
       return [];
     }
 
-    const tools = ["list-schemas"];
+    const tools: string[] = [];
 
     try {
       const schemas = await findAndParseSchemas(this.app, this.config);
-      for (const schema of schemas) {
-        const toolName = `update-${schema.metadata.schemaName.toLowerCase()}`;
-        tools.push(toolName);
+      if (schemas.length > 0) {
+        tools.push("list-schemas");
+        for (const schema of schemas) {
+          const toolName = `update-${schema.metadata.schemaName.toLowerCase()}`;
+          tools.push(toolName);
+        }
       }
     } catch (error) {
       console.error("Error getting dynamic tools:", error);
