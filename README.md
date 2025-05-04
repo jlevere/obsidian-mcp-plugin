@@ -79,10 +79,51 @@ You can find the correct url from the plugin's setting pannel under endpoints.
 ### Available Tools
 
 - `read-file`: Get file contents
-- `diff-edit-file`: Smart file updates
-- `fuzzy-search`: Search vault contents
+- `diff-edit-file`: Smart, context-aware file updates using patch blocks (see below for usage)
+- `search-contents`: Fuzzy search across the contents of all files in your vault
+- `search-filenames`: Fuzzy search across all file names in your vault
 - `vault-tree`: Browse vault structure
 - `upsert-file`: Create or update files
+- `rollback-edit`: Roll back the last edit to a markdown file (reverts the last change made by supported tools)
+
+#### `diff-edit-file`
+
+This tool allows you to update a section of a file by providing a snippet (the "original") and the new content (the "updated"). The tool will locate the original block in the file using fuzzy matching and replace it with your updated version. This is safer and more robust than replacing the whole file or relying on line numbers.
+
+**How to use:**
+
+- **original**: A copy-pasted snippet from your file — include enough surrounding lines to give unique context so the tool can reliably fuzzy-match it.
+- **updated**: The new version you want to replace it with.
+
+**Example:**
+
+```json
+{
+  "path": "Notes/Example.md",
+  "original": "def greet():\n    return 'Hello'",
+  "updated": "def greet():\n    return 'Hi there!'"
+}
+```
+
+If the block is found and the patch is valid, only that section will be updated. If the file is empty, the updated content will be written as the new file content.
+
+#### `rollback-edit`
+
+This tool allows you to revert the last change made to a markdown file by supported file-writing tools (`diff-edit-file`, `upsert-file`, or structured update tools). Before any of these tools modify a file, the previous content is saved in a rollback store. You can use `rollback-edit` to restore the file to its previous state.
+
+**How to use:**
+
+- **path**: The path to the markdown file you want to roll back (must end with `.md`).
+
+**Example:**
+
+```json
+{
+  "path": "Notes/Example.md"
+}
+```
+
+If a rollback is available, the file will be restored to its previous content, and you'll get a message with the timestamp and reason for the last change. If not, you'll get an error message.
 
 ## Development
 
