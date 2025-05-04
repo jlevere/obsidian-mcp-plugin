@@ -2,6 +2,7 @@ import { App, TFile, normalizePath } from "obsidian";
 import { ValidatedSchema } from "./schema";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types";
 import yaml from "js-yaml";
+import { saveRollback } from "../utils/helpers";
 
 /**
  * Generic handler for updating or creating vault files based on a schema definition.
@@ -111,6 +112,8 @@ export async function handleStructuredUpdate(
 
     // Update existing file
     const content = await app.vault.cachedRead(file);
+    // Save rollback before modifying
+    await saveRollback(app, targetPath, "structured-update");
     const cache = app.metadataCache.getFileCache(file);
     let body = "";
 

@@ -1,6 +1,7 @@
 import { App, TFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { saveRollback } from "../utils/helpers";
 
 export const description = `
   Upserts a file in the vault. If the file doesn't exist, it is created with the provided content. 
@@ -43,6 +44,7 @@ export function registerUpsertFileHandler(app: App, mcpServer: McpServer) {
           }
 
           let fileContents = await app.vault.read(file);
+          await saveRollback(app, normPath, "upsert-file");
           fileContents += fileContents.endsWith("\n") ? "" : "\n";
           fileContents += content;
 

@@ -4,6 +4,7 @@ import {
   TFolder,
   TAbstractFile,
   prepareFuzzySearch,
+  normalizePath,
 } from "obsidian";
 import {
   FileMetadataObject,
@@ -118,4 +119,53 @@ export async function buildVaultTree(
   }
 
   return null;
+}
+
+// Rollback store for file content before edits
+export interface RollbackEntry {
+  content: string;
+  timestamp: number;
+  reason: string;
+}
+
+export const rollbackStore: Record<string, RollbackEntry> = {};
+
+/**
+ * Save the current content of a file to the rollback store before modification.
+ */
+export async function saveRollback(app: App, path: string, reason: string) {
+  const normPath = normalizePath(path);
+  const file = app.vault.getAbstractFileByPath(normPath);
+  if (file && file instanceof TFile) {
+    const content = await app.vault.read(file);
+    rollbackStore[normPath] = {
+      content,
+      timestamp: Date.now(),
+      reason,
+    };
+  }
+}
+
+/**
+ * Restore a file's content from the rollback store, if available.
+ */
+export async function restoreRollback(
+  app: App,
+  path: string
+): Promise<{ success: boolean; message: string }> {
+  const normPath = normalizePath(path);
+  const entry = rollbackStore[normPath];
+  if (!entry) {
+    return { success: false, message: "No rollback available for this file." };
+  }
+  const file = app.vault.getAbstractFileByPath(normPath);
+  if (!file || !(file instanceof TFile)) {
+    return { success: false, message: "File not found for rollback." };
+  }
+  await app.vault.modify(file, entry.content);
+  const msg = `Rollback successful. Timestamp: ${new Date(
+    entry.timestamp
+  ).toISOString()}, Reason: ${entry.reason}`;
+  delete rollbackStore[normPath];
+  return { success: true, message: msg };
 }
