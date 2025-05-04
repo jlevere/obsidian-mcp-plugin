@@ -1,13 +1,12 @@
 import { registerReadHandler } from "../../src/vault/read";
 import { App, TFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { findSimilarFiles } from "../../src/utils/helpers";
 import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 // Mock the helpers module
 jest.mock("../../src/utils/helpers", () => ({
-  findSimilarFiles: jest.fn(),
+  getSimilarFilesSuggestion: jest.fn(),
 }));
 
 // Mock Obsidian
@@ -60,9 +59,18 @@ describe("Vault Read Handler", () => {
   it("normalizes the file path", async () => {
     const testPath = "test/path/file.md";
     (app.vault.getAbstractFileByPath as jest.Mock).mockReturnValue(null);
-    (findSimilarFiles as jest.Mock).mockReturnValue([]);
+    const getSimilarFilesSuggestion =
+      require("../../src/utils/helpers").getSimilarFilesSuggestion;
+    getSimilarFilesSuggestion.mockReturnValue("");
 
-    await handlerFunction({ path: testPath }, { signal: mockAbortSignal });
+    await handlerFunction(
+      { path: testPath },
+      {
+        signal: mockAbortSignal,
+        sendNotification: jest.fn(),
+        sendRequest: jest.fn(),
+      }
+    );
 
     expect(normalizePath).toHaveBeenCalledWith(testPath);
   });
@@ -77,7 +85,11 @@ describe("Vault Read Handler", () => {
 
     const result = await handlerFunction(
       { path: testPath },
-      { signal: mockAbortSignal }
+      {
+        signal: mockAbortSignal,
+        sendNotification: jest.fn(),
+        sendRequest: jest.fn(),
+      }
     );
 
     expect(result).toEqual({
@@ -87,23 +99,26 @@ describe("Vault Read Handler", () => {
 
   it("suggests similar files when file not found", async () => {
     const testPath = "test/path/file.md";
-    const similarFiles = [
-      { path: "test/path/files.md", score: 0.8 },
-      { path: "test/path/other-file.md", score: 0.6 },
-    ];
-
+    const suggestionString =
+      "\n\nDid you mean:\n- test/path/files.md\n- test/path/other-file.md";
     (app.vault.getAbstractFileByPath as jest.Mock).mockReturnValue(null);
-    (findSimilarFiles as jest.Mock).mockReturnValue(similarFiles);
+    const getSimilarFilesSuggestion =
+      require("../../src/utils/helpers").getSimilarFilesSuggestion;
+    getSimilarFilesSuggestion.mockReturnValue(suggestionString);
 
     const result = await handlerFunction(
       { path: testPath },
-      { signal: mockAbortSignal }
+      {
+        signal: mockAbortSignal,
+        sendNotification: jest.fn(),
+        sendRequest: jest.fn(),
+      }
     );
 
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("Did you mean:");
-    expect(result.content[0].text).toContain(similarFiles[0].path);
-    expect(result.content[0].text).toContain(similarFiles[1].path);
+    expect(result.content[0].text).toContain("test/path/files.md");
+    expect(result.content[0].text).toContain("test/path/other-file.md");
   });
 
   it("handles folder path appropriately", async () => {
@@ -114,7 +129,11 @@ describe("Vault Read Handler", () => {
 
     const result = await handlerFunction(
       { path: testPath },
-      { signal: mockAbortSignal }
+      {
+        signal: mockAbortSignal,
+        sendNotification: jest.fn(),
+        sendRequest: jest.fn(),
+      }
     );
 
     expect(result.isError).toBe(true);
@@ -133,7 +152,11 @@ describe("Vault Read Handler", () => {
 
     const result = await handlerFunction(
       { path: testPath },
-      { signal: mockAbortSignal }
+      {
+        signal: mockAbortSignal,
+        sendNotification: jest.fn(),
+        sendRequest: jest.fn(),
+      }
     );
 
     expect(result.isError).toBe(true);
