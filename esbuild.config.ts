@@ -1,4 +1,4 @@
-import esbuild from "esbuild";
+import esbuild, { BuildOptions } from "esbuild";
 import process from "process";
 import builtins from "builtin-modules";
 import { mkdirSync } from "fs";
@@ -15,7 +15,7 @@ const outfile = prod ? "dist/main.js" : "main.js";
 
 mkdirSync(dirname(outfile), { recursive: true });
 
-const options = {
+const options: BuildOptions = {
   banner: {
     js: banner,
   },
@@ -57,7 +57,7 @@ const options = {
   outfile,
 };
 
-async function run() {
+async function run(): Promise<void> {
   try {
     if (prod) {
       await esbuild.build(options);
