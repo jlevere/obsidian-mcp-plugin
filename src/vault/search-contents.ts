@@ -4,18 +4,19 @@ import { z } from "zod";
 import { SearchResponseItem } from "../utils/types";
 
 export const description = `
-Performs a fuzzy search across all files in the vault.
+Performs a fuzzy search contents across all files in the vault.
 
-The search query can be a partial match and will return files that best match the query.
-Results are sorted by relevance.
+The search query can be a partial match and will return the names
+of the files with contents that best match the query. Results are
+sorted by relevance.
 
 Returns:
 - files: Array of matching file paths
 `;
 
-export function registerFuzzySearchHandler(app: App, mcpServer: McpServer) {
+export function registerSearchContentsHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "fuzzy-search",
+    "search-contents",
     description,
     {
       query: z.string().describe("Search query for vault"),

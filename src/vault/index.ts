@@ -6,13 +6,17 @@ import {
   description as diffEditDescription,
 } from "./diff-edit";
 import {
-  registerFuzzySearchHandler,
-  description as fuzzySearchDescription,
-} from "./fuzzy-search";
+  registerSearchContentsHandler,
+  description as searchContentsDescription,
+} from "./search-contents";
+import {
+  registerSearchFilenamesHandler,
+  description as searchFilenamesDescription,
+} from "./search-filenames";
 import {
   registerVaultTreeHandler,
   description as treeDescription,
-} from "./tree";
+} from "./vault-tree";
 import {
   registerUpsertFileHandler,
   description as upsertDescription,
@@ -22,8 +26,9 @@ import { ToolRegistry } from "../utils/types";
 export const VAULT_TOOLS: ToolRegistry = {
   "read-file": registerReadHandler,
   "diff-edit-file": registerDiffEditHandler,
-  "fuzzy-search": registerFuzzySearchHandler,
-  "vault-tree": registerVaultTreeHandler,
+  "search-contents": registerSearchContentsHandler,
+  "search-filenames": registerSearchFilenamesHandler,
+  tree: registerVaultTreeHandler,
   "upsert-file": registerUpsertFileHandler,
 };
 
@@ -31,15 +36,17 @@ export const VAULT_TOOLS: ToolRegistry = {
 export const TOOL_DESCRIPTIONS: Record<string, string> = {
   "read-file": readDescription,
   "diff-edit-file": diffEditDescription,
-  "fuzzy-search": fuzzySearchDescription,
-  "vault-tree": treeDescription,
+  "search-contents": searchContentsDescription,
+  "search-filenames": searchFilenamesDescription,
+  tree: treeDescription,
   "upsert-file": upsertDescription,
 } as const;
 
 export function registerVaultTools(app: App, mcpServer: McpServer) {
   registerReadHandler(app, mcpServer);
   registerDiffEditHandler(app, mcpServer);
-  registerFuzzySearchHandler(app, mcpServer);
+  registerSearchContentsHandler(app, mcpServer);
+  registerSearchFilenamesHandler(app, mcpServer);
   registerVaultTreeHandler(app, mcpServer);
   registerUpsertFileHandler(app, mcpServer);
 }
