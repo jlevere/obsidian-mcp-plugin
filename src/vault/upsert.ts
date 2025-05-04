@@ -3,11 +3,18 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 export const description = `
-Upserts a file in the vault. If the file doesn't exist, it is created with the provided content.
-If it exists, the provided content is appended to the end of the file.  The path will be normalized.
+  Upserts a file in the vault. If the file doesn't exist, it is created with the provided content. 
+  If it exists, the provided content is appended to the end of the file. The path will be normalized.`;
 
-FILENAME MUST END IN '.md' MUST BE MARKDOWN EXTENTION
-`;
+async function ensureFolder(app: App, folderPath: string) {
+  try {
+    await app.vault.createFolder(folderPath);
+  } catch (err: any) {
+    if (!err?.message?.includes("already exists")) {
+      throw err;
+    }
+  }
+}
 
 export function registerUpsertFileHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
@@ -20,7 +27,6 @@ export function registerUpsertFileHandler(app: App, mcpServer: McpServer) {
     async ({ path, content }) => {
       try {
         const normPath = normalizePath(path);
-
         const file = app.vault.getAbstractFileByPath(normPath);
 
         if (file) {
@@ -37,9 +43,7 @@ export function registerUpsertFileHandler(app: App, mcpServer: McpServer) {
           }
 
           let fileContents = await app.vault.read(file);
-          if (!fileContents.endsWith("\n")) {
-            fileContents += "\n";
-          }
+          fileContents += fileContents.endsWith("\n") ? "" : "\n";
           fileContents += content;
 
           await app.vault.adapter.write(normPath, fileContents);
@@ -50,9 +54,7 @@ export function registerUpsertFileHandler(app: App, mcpServer: McpServer) {
           const lastSlashIndex = normPath.lastIndexOf("/");
           if (lastSlashIndex !== -1) {
             const folderPath = normPath.substring(0, lastSlashIndex);
-            try {
-              await app.vault.createFolder(folderPath);
-            } catch (err) {}
+            await ensureFolder(app, folderPath);
           }
 
           await app.vault.create(normPath, content);
