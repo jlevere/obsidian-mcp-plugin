@@ -1,7 +1,7 @@
 import { App, TFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { findSimilarFiles } from "../utils/helpers";
+import { findSimilarFiles, getSimilarFilesSuggestion } from "../utils/helpers";
 
 export const description = `
 Reads the content of a file from the Obsidian vault.
@@ -24,14 +24,7 @@ export function registerReadHandler(app: App, mcpServer: McpServer) {
 
         // If file not found, look for similar files
         if (!file) {
-          const similarFiles = findSimilarFiles(app, normPath);
-          const suggestions =
-            similarFiles.length > 0
-              ? `\n\nDid you mean:\n${similarFiles
-                  .map((f) => `- ${f.path}`)
-                  .join("\n")}`
-              : "";
-
+          const suggestions = getSimilarFilesSuggestion(app, normPath);
           return {
             content: [
               {

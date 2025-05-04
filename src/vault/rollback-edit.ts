@@ -15,7 +15,6 @@ export function registerRollbackEditHandler(app: App, mcpServer: McpServer) {
     {
       path: z
         .string()
-        .regex(/^[^\/].*\.md$/)
         .describe("Path to the markdown file in the vault to rollback"),
     },
     async ({ path }) => {

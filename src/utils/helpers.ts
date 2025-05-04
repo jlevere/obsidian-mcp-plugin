@@ -169,3 +169,19 @@ export async function restoreRollback(
   delete rollbackStore[normPath];
   return { success: true, message: msg };
 }
+
+/**
+ * Returns a suggestion string for similar files if the requested file is not found.
+ * @param app Obsidian App instance
+ * @param normPath Normalized path of the file being searched for
+ * @returns Suggestion string (may be empty)
+ */
+export function getSimilarFilesSuggestion(app: App, normPath: string): string {
+  const similarFiles = findSimilarFiles(app, normPath);
+  if (similarFiles.length > 0) {
+    return `\n\nDid you mean:\n${similarFiles
+      .map((f) => `- ${f.path}`)
+      .join("\n")}`;
+  }
+  return "";
+}

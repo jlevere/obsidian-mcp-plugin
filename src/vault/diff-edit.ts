@@ -7,7 +7,7 @@ import {
   stringifyPatches,
   match,
 } from "@sanity/diff-match-patch";
-import { saveRollback } from "../utils/helpers";
+import { saveRollback, getSimilarFilesSuggestion } from "../utils/helpers";
 
 export const description = `
 Please provide a patch like this:
@@ -53,10 +53,7 @@ export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
     "diff-edit-file",
     description,
     {
-      path: z
-        .string()
-        .regex(/^[^\/].*\.md$/)
-        .describe("Path to the file in the vault"),
+      path: z.string().describe("Path to the file in the vault"),
       original: z
         .string()
         .min(1)
@@ -72,8 +69,14 @@ export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
         const normPath = normalizePath(path);
         const file = app.vault.getAbstractFileByPath(normPath);
         if (!file) {
+          const suggestions = getSimilarFilesSuggestion(app, normPath);
           return {
-            content: [{ type: "text", text: `File not found: ${normPath}` }],
+            content: [
+              {
+                type: "text",
+                text: `File not found: ${normPath}${suggestions}`,
+              },
+            ],
             isError: true,
           };
         }
