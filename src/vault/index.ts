@@ -16,7 +16,7 @@ import {
 import {
   registerVaultTreeHandler,
   description as treeDescription,
-} from "./vault-tree";
+} from "./tree";
 import {
   registerUpsertFileHandler,
   description as upsertDescription,

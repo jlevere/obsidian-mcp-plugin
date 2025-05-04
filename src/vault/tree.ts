@@ -12,7 +12,7 @@ A "depth" parameter is available to limit how many subfolder levels to include.
 
 export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "vault-tree",
+    "tree",
     description,
     {
       dir: z
