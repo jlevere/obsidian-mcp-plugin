@@ -29,7 +29,10 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h2", { text: "MCP" });
+    containerEl.createEl("h4", { text: "Vault MCP" });
+
+    // Restart Server Button
+    this.restartSever(containerEl);
 
     // Server Settings
     this.displayServerSettings(containerEl);
@@ -40,8 +43,9 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
 
     // Dynamic Tools Settings
     await this.displayDynamicToolsSettings(containerEl);
+  }
 
-    // Restart Server Button
+  private restartSever(containerEl: HTMLElement): void {
     new Setting(containerEl)
       .setName("Restart Server")
       .setDesc("Restart the MCP server to apply changes")
@@ -90,13 +94,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
 
     containerEl.createEl("h4", {
       text: "Listening Endpoints",
-      cls: "setting-item-name",
     });
-
-    const host = this.plugin.settings.bindingHost || "0.0.0.0";
-    const port = this.plugin.settings.port || 3000;
-    const mcpUrl = `http://${host}:${port}/mcp`;
-    const sseUrl = `http://${host}:${port}/sse`;
 
     const createEndpointSetting = (name: string, url: string) => {
       new Setting(containerEl)
@@ -115,6 +113,15 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
             })
         );
     };
+
+    const host = this.plugin.settings.bindingHost || "0.0.0.0";
+    const port = this.plugin.settings.port || 3000;
+    const mcpUrl = `http://${
+      host === "0.0.0.0" ? "localhost" : host
+    }:${port}/mcp`;
+    const sseUrl = `http://${
+      host === "0.0.0.0" ? "localhost" : host
+    }:${port}/sse`;
 
     createEndpointSetting("Streamable HTTP", mcpUrl);
     createEndpointSetting("SSE", sseUrl);
@@ -161,8 +168,6 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
         dynamicToolsContainer.style.marginTop = "10px";
         dynamicToolsContainer.style.marginLeft = "10px";
 
-        console.log(dynamicTools);
-
         for (const toolName of dynamicTools) {
           this.createToggleSetting(
             dynamicToolsContainer,
@@ -206,24 +211,22 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
   }
 
   private displayToolsSection(containerEl: HTMLElement): void {
-    const toolsContainer = containerEl.createDiv();
-    toolsContainer.createEl("h3", { text: "Available Tools" });
+    containerEl.createEl("h3", { text: "Available Tools" });
 
     Object.keys(VAULT_TOOLS).forEach((toolName) => {
       const description =
         TOOL_DESCRIPTIONS[toolName] ?? "No description available";
-      this.createToggleSetting(toolsContainer, toolName, description);
+      this.createToggleSetting(containerEl, toolName, description);
     });
   }
 
   private displayResourcesSection(containerEl: HTMLElement): void {
-    const resourcesContainer = containerEl.createDiv();
-    resourcesContainer.createEl("h3", { text: "Available Resources" });
+    containerEl.createEl("h3", { text: "Available Resources" });
 
     Object.keys(VAULT_RESOURCES).forEach((resourceName) => {
       const description =
         RESOURCE_DESCRIPTIONS[resourceName] ?? "No description available";
-      this.createToggleSetting(resourcesContainer, resourceName, description);
+      this.createToggleSetting(containerEl, resourceName, description);
     });
   }
 }
