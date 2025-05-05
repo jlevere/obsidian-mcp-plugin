@@ -1,7 +1,7 @@
 import { App, prepareFuzzySearch, TFile } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { SearchResponseItem } from "../utils/types";
+import { SearchResponseItem } from "../types";
 
 export const description = `
 Performs a fuzzy search contents across all files in the vault.

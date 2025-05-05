@@ -12,7 +12,7 @@ import {
   FileTreeNode,
   FolderTreeNode,
   TreeBuildOptions,
-} from "./types";
+} from "../types";
 
 export async function getFileMetadataObject(
   app: App,

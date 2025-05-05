@@ -1,5 +1,5 @@
 import { App, Plugin, Notice } from "obsidian";
-import { ObsidianMcpSettings } from "./utils/types";
+import { ObsidianMcpSettings } from "./types";
 import { DEFAULT_SETTINGS, PLUGIN_NAME } from "./constants";
 import { ObsidianMcpSettingTab } from "./settingsTab";
 import { ServerManager } from "./managers/ServerManager";
