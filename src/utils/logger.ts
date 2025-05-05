@@ -1,4 +1,4 @@
-import { PLUGIN_ID } from "./constants";
+import { PLUGIN_ID } from "../constants";
 import { Roarr, ROARR, type RoarrGlobalState } from "roarr";
 
 // Create a child logger with plugin context
