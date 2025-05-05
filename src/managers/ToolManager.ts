@@ -2,7 +2,7 @@ import { App } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { VAULT_TOOLS } from "../vault/index";
 import { VAULT_RESOURCES } from "../resources";
-import { ObsidianMcpSettings } from "../types";
+import { ObsidianMcpSettings } from "@types";
 import { StructuredManager } from "./StructuredManager";
 
 export class ToolManager {

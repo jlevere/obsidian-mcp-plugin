@@ -5,7 +5,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import express from "express";
 import * as http from "http";
 import { randomUUID } from "crypto";
-import { ServerConfig } from "../types";
+import { ServerConfig } from "@types";
 import { PLUGIN_NAME } from "../constants";
 
 /**

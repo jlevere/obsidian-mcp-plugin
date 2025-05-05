@@ -8,7 +8,7 @@ import {
   registerActiveFileResource,
   metadata as activeFileMetadata,
 } from "./active-file";
-import { ToolRegistry } from "../types";
+import { ToolRegistry } from "@types";
 
 export const VAULT_RESOURCES: ToolRegistry = {
   "vault-map": registerVaultMapResource,

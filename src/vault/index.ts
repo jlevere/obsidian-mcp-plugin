@@ -25,7 +25,7 @@ import {
   registerRollbackEditHandler,
   description as rollbackEditDescription,
 } from "./rollback-edit";
-import { ToolRegistry } from "../types";
+import { ToolRegistry } from "@types";
 
 export const VAULT_TOOLS: ToolRegistry = {
   "read-file": registerReadHandler,

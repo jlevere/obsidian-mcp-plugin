@@ -3,7 +3,7 @@ import ObsidianMcpPlugin from "./main";
 import { VAULT_TOOLS, TOOL_DESCRIPTIONS } from "./vault/index";
 import { VAULT_RESOURCES, RESOURCE_DESCRIPTIONS } from "./resources";
 import { PLUGIN_NAME } from "./constants";
-import { enableRoarrLogging } from "./logger";
+import { enableRoarrLogging } from "@logger";
 
 export class ObsidianMcpSettingTab extends PluginSettingTab {
   plugin: ObsidianMcpPlugin;

@@ -1,7 +1,7 @@
 import { App, TFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { findSimilarFiles, getSimilarFilesSuggestion } from "../utils/helpers";
+import { getSimilarFilesSuggestion } from "../utils/helpers";
 
 export const description = `
 Reads the content of a file from the Obsidian vault.

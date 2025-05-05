@@ -1,4 +1,4 @@
-import { ObsidianMcpSettings } from "./types";
+import { ObsidianMcpSettings } from "@types";
 
 export const DEFAULT_SETTINGS: ObsidianMcpSettings = {
   port: 3000,
