@@ -18,11 +18,21 @@ enough surrounding lines to give unique context so the tool can reliably fuzzy-m
 
 - Do **not** change anything outside the specified block.
 
+You will be given a diff of the changes actually applied to the file in the response. 
+Be sure that the diff is what you expect and use the rollback edit tool to revert
+if things are not as expected.
+
 Example:
 
     {
       "original": "def greet():\n    return 'Hello'",
       "updated": "def greet():\n    return 'Hi there!'"
+    }
+
+    Response:
+
+    {
+      "diff": "@@ -1 +1 @@\n-def greet():\n    return 'Hello'\n+def greet():\n    return 'Hi there!'"
     }
 `;
 
