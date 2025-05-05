@@ -7,6 +7,8 @@ export const DEFAULT_SETTINGS: ObsidianMcpSettings = {
   enableDynamicTools: false,
   dynamicToolsPath: "metadata/schemas",
   enableDebugLogging: false,
+  enableAuth: false,
+  authToken: "",
 };
 
 export const PLUGIN_NAME = "Vault MCP";

@@ -142,6 +142,58 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
 
     createEndpointSetting("Streamable HTTP", mcpUrl);
     createEndpointSetting("SSE", sseUrl);
+
+    containerEl.createEl("h4", { text: "Authentication" });
+    new Setting(containerEl)
+      .setName("Enable Authentication")
+      .setDesc("Require bearer token for all API requests.")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.enableAuth)
+          .onChange(async (value) => {
+            this.plugin.settings.enableAuth = value;
+            await this.plugin.saveSettings();
+            new Notice(
+              `Authentication ${
+                value ? "enabled" : "disabled"
+              }. Please restart the server to apply changes.`
+            );
+            await this.display();
+          })
+      );
+
+    if (this.plugin.settings.enableAuth) {
+      // Masked token display
+      let masked = this.plugin.settings.authToken.replace(/.(?=.{4})/g, "*");
+      new Setting(containerEl)
+        .setName("Auth Token")
+        .setDesc(
+          "Clients must send this token in the 'Authorization: Bearer <token>' HTTP header."
+        )
+        .addText((text) => text.setValue(masked).setDisabled(true))
+        .addButton((button) =>
+          button
+            .setIcon("copy")
+            .setTooltip("Copy Token")
+            .onClick(() => {
+              navigator.clipboard.writeText(this.plugin.settings.authToken);
+              new Notice("Auth token copied to clipboard!");
+            })
+        )
+        .addButton((button) =>
+          button
+            .setButtonText("Regenerate")
+            .setTooltip("Generate a new token (clients will need to update)")
+            .onClick(async () => {
+              this.plugin.settings.authToken = crypto.randomUUID();
+              await this.plugin.saveSettings();
+              new Notice(
+                "New auth token generated. Please restart the server."
+              );
+              await this.display();
+            })
+        );
+    }
   }
 
   private async displayDynamicToolsSettings(

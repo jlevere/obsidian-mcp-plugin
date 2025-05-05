@@ -14,11 +14,15 @@ export interface ObsidianMcpSettings {
   enableDynamicTools: boolean;
   dynamicToolsPath: string;
   enableDebugLogging: boolean;
+  enableAuth: boolean;
+  authToken: string;
 }
 
 export interface ServerConfig {
   port: number;
   bindingHost: string;
+  enableAuth: boolean;
+  authToken: string;
 }
 
 export interface ToolRegistration {

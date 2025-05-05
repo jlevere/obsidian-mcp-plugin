@@ -44,6 +44,8 @@ export default class ObsidianMcpPlugin extends Plugin {
       {
         port: this.settings.port,
         bindingHost: this.settings.bindingHost,
+        enableAuth: this.settings.enableAuth,
+        authToken: this.settings.authToken,
       },
       this.manifest.version
     );
@@ -77,6 +79,11 @@ export default class ObsidianMcpPlugin extends Plugin {
 
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    // Generate a token if missing
+    if (!this.settings.authToken) {
+      this.settings.authToken = crypto.randomUUID();
+      await this.saveSettings();
+    }
   }
 
   async saveSettings() {
@@ -94,6 +101,8 @@ export default class ObsidianMcpPlugin extends Plugin {
       this.serverManager.updateConfig({
         port: this.settings.port,
         bindingHost: this.settings.bindingHost,
+        enableAuth: this.settings.enableAuth,
+        authToken: this.settings.authToken,
       });
       await this.serverManager.restart();
       new Notice(`${PLUGIN_NAME} server restarted successfully`);

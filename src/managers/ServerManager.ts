@@ -3,10 +3,13 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
+import { Request, Response, NextFunction } from "express";
+import type { RequestHandler } from "express";
 import * as http from "http";
 import { randomUUID } from "crypto";
 import { ServerConfig } from "@types";
 import { PLUGIN_NAME } from "../constants";
+import { timingSafeEqual } from "crypto";
 
 /**
  * Manages the MCP server instance and its transports.
@@ -88,6 +91,14 @@ export class ServerManager {
       if (this.onToolRegistration) {
         await this.onToolRegistration();
       }
+
+      // Bearer auth middleware
+      this.expressApp.use(
+        bearerAuth(
+          () => (this.config.enableAuth ? this.config.authToken : null),
+          PLUGIN_NAME
+        )
+      );
 
       // Setup routes
       this.setupRoutes();
@@ -517,4 +528,75 @@ export class ServerManager {
       });
     }
   }
+}
+
+export function bearerAuth(
+  getToken: () => string | null | undefined,
+  realm = "MCP"
+): RequestHandler {
+  return (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const token = getToken();
+
+      if (token == null) {
+        return next();
+      }
+
+      const authHeader = req.header("Authorization") || "";
+
+      const [scheme, credentials] = authHeader.split(/\s+/, 2);
+
+      if (scheme?.toLowerCase() !== "bearer" || !credentials) {
+        res
+          .status(401)
+          .header("WWW-Authenticate", `Bearer realm="${realm}"`)
+          .json({
+            jsonrpc: "2.0",
+            error: {
+              code: -32002,
+              message: "Forbidden: invalid bearer token.",
+            },
+            id: null,
+          });
+        return;
+      }
+
+      const expected = Buffer.from(token, "utf8");
+      const actual = Buffer.from(credentials.trim(), "utf8");
+
+      let areEqual = false;
+      if (expected.length === actual.length) {
+        areEqual = timingSafeEqual(expected, actual);
+      }
+
+      if (!areEqual) {
+        res
+          .status(403)
+          .header("WWW-Authenticate", `Bearer realm="${realm}"`)
+          .json({
+            jsonrpc: "2.0",
+            error: {
+              code: -32002,
+              message: "Forbidden: invalid bearer token.",
+            },
+            id: null,
+          });
+        return;
+      }
+      next();
+    } catch (error) {
+      console.error("[Auth] CRITICAL ERROR in auth middleware:", error);
+      if (!res.headersSent) {
+        res.status(500).json({
+          jsonrpc: "2.0",
+          error: {
+            code: -32000,
+            message: "Internal Server Error during authentication",
+          },
+          id: null,
+        });
+      }
+      return;
+    }
+  };
 }
