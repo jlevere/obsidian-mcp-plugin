@@ -2,6 +2,8 @@ import { App, PluginSettingTab, Setting, Notice, debounce } from "obsidian";
 import ObsidianMcpPlugin from "./main";
 import { VAULT_TOOLS, TOOL_DESCRIPTIONS } from "./vault/index";
 import { VAULT_RESOURCES, RESOURCE_DESCRIPTIONS } from "./resources";
+import { PLUGIN_NAME } from "./constants";
+import { enableRoarrLogging } from "./logger";
 
 export class ObsidianMcpSettingTab extends PluginSettingTab {
   plugin: ObsidianMcpPlugin;
@@ -29,10 +31,9 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h4", { text: "Vault MCP" });
+    containerEl.createEl("h4", { text: PLUGIN_NAME });
 
-    // Restart Server Button
-    this.restartSever(containerEl);
+    this.serverControls(containerEl);
 
     // Server Settings
     this.displayServerSettings(containerEl);
@@ -45,7 +46,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     await this.displayDynamicToolsSettings(containerEl);
   }
 
-  private restartSever(containerEl: HTMLElement): void {
+  private serverControls(containerEl: HTMLElement): void {
     new Setting(containerEl)
       .setName("Restart Server")
       .setDesc("Restart the MCP server to apply changes")
@@ -54,6 +55,22 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           await this.plugin.restartServer();
           await this.display();
         })
+      );
+
+    new Setting(containerEl)
+      .setName("Enable Debug Logging")
+      .setDesc(
+        "Enable logging to console using roarr (ctrl+shift+i to view console)"
+      )
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.enableDebugLogging)
+          .onChange(async (value) => {
+            this.plugin.settings.enableDebugLogging = value;
+            await this.plugin.saveSettings();
+            enableRoarrLogging(value);
+            new Notice(`Debug logging ${value ? "enabled" : "disabled"}`);
+          })
       );
   }
 
