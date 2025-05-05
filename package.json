@@ -9,8 +9,9 @@
   },
   "packageManager": "pnpm@10.8.0",
   "scripts": {
-    "dev": "npx tsx esbuild.config.ts",
+    "dev": "npx tsx esbuild.config.ts watch",
     "build": "pnpm tsc -noEmit -skipLibCheck && npx tsx esbuild.config.ts production",
+    "build:dev": "pnpm tsc -noEmit -skipLibCheck && npx tsx esbuild.config.ts",
     "test": "pnpm jest",
     "inspect": "npx @modelcontextprotocol/inspector pnpm node main.js",
     "package": "pnpm build && zip plugin.zip dist/main.js manifest.json"
@@ -32,6 +33,7 @@
     "@typescript-eslint/parser": "^8.29.1",
     "builtin-modules": "^5.0.0",
     "esbuild": "0.25.2",
+    "esbuild-plugin-alias": "^0.2.1",
     "eslint": "^9.24.0",
     "jest": "^29.7.0",
     "obsidian": "^1.8.7",
