@@ -29,7 +29,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h2", { text: "Obsidian MCP" });
+    containerEl.createEl("h2", { text: "MCP" });
 
     // Server Settings
     this.displayServerSettings(containerEl);
@@ -54,7 +54,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
   }
 
   private displayServerSettings(containerEl: HTMLElement): void {
-    containerEl.createEl("h3", { text: "Server Settings" });
+    containerEl.createEl("h3", { text: "HTTP Server" });
 
     new Setting(containerEl)
       .setName("Server Port")

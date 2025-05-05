@@ -1,10 +1,9 @@
 {
-	"id": "obsidian-mcp-plugin",
-	"name": "obsidian-mcp-plugin",
+	"id": "vault-mcp",
+	"name": "Vault MCP",
 	"version": "0.0.1",
 	"minAppVersion": "1.8.0",
-	"description": "Allow an AI to interact with your notes in Obsidian via MCP",
+	"description": "Allow an AI to interact with your vault's notes through a self-contained MCP server",
 	"author": "jlevere",
-	"authorUrl": "https://github.com/jlevere",
 	"isDesktopOnly": true
 }
