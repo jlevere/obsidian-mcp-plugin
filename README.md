@@ -30,9 +30,12 @@ way for applications to interact with your vault.
   - Read and write files with smart diffing
   - Fuzzy search across your vault
   - Navigate vault structure programmatically
-- **Configurable:** Customize server settings and tool availability
+- **Configurable:** Customize server settings (port, host), tool availability, and security
+- **Optional Authentication:** Secure your server with optional Bearer token authentication.
 
 ![tool-selection](./docs/obsidian-settings-tools.png)
+
+![auth-settings](./docs/obsidian-settings-auth.png)
 
 ## Installation
 
@@ -53,9 +56,13 @@ way for applications to interact with your vault.
 
 ### Basic Setup
 
-1. Enable the plugin
-2. Configure port and host in settings
-3. Restart the plugin to apply changes
+1. Enable the plugin in Obsidian's Community Plugins section.
+2. Navigate to the plugin settings.
+3. Configure the **Server Port** and **Binding Host**. The default port is `3000`, and the default host `0.0.0.0` binds to all network interfaces. Use `127.0.0.1` to restrict access to your local machine only.
+4. **(Optional) Enable Authentication:**
+   - For endpoint security, you can enable Bearer token authentication. Toggle **Enable Authentication** in the settings.
+   - A unique **Auth Token** will be displayed. Clients must include this token in the `Authorization` HTTP header like so: `Authorization: Bearer <your_token>`.
+5. **Restart the Server:** Use the "Restart Server" button in the settings to apply any changes to the port, host, or authentication settings.
 
 ### Connection Methods
 
