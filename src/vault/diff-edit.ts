@@ -1,7 +1,7 @@
 import { App, TFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { saveRollback } from "../utils/helpers";
+import { resolveTFileOrError, saveRollback } from "../utils/helpers";
 import { createPatch } from "diff";
 
 /**
@@ -164,16 +164,10 @@ export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
       udiff: z.string().describe("Unified diff block to apply (not fenced)."),
     },
     async ({ path, udiff }) => {
-      const normPath = normalizePath(path);
-      const file = app.vault.getAbstractFileByPath(normPath);
-      if (!file || !(file instanceof TFile)) {
-        return {
-          content: [
-            { type: "text", text: `File not found or not a file: ${normPath}` },
-          ],
-          isError: true,
-        };
-      }
+      const result = resolveTFileOrError(app, path);
+      if ("error" in result) return result;
+      const { file, normPath } = result;
+
       let fileContent = await app.vault.read(file);
       await saveRollback(app, normPath, "diff-edit-file");
       try {

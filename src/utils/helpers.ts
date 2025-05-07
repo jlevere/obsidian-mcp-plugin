@@ -185,3 +185,36 @@ export function getSimilarFilesSuggestion(app: App, normPath: string): string {
   }
   return "";
 }
+
+/**
+ * Attempts to resolve a file by path, returning a TFile or a standard error result.
+ */
+export function resolveTFileOrError(app: App, path: string) {
+  const normPath = normalizePath(path);
+  const file = app.vault.getAbstractFileByPath(normPath);
+
+  if (!file) {
+    return {
+      error: {
+        content: [
+          {
+            type: "text",
+            text: getSimilarFilesSuggestion(app, normPath),
+          },
+        ],
+        isError: true,
+      },
+    };
+  }
+  if (!(file instanceof TFile)) {
+    return {
+      error: {
+        content: [
+          { type: "text", text: `Path indicated is not a file: ${normPath}` },
+        ],
+        isError: true,
+      },
+    };
+  }
+  return { file, normPath };
+}
