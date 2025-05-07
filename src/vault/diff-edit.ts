@@ -7,7 +7,7 @@ import { createPatch } from "diff";
 /**
  * Apply a unified diff to the given original content.
  * @param path - The file path that the diff is intended for.
- * @param udiff - The unified diff string (in Aider's simplified format).
+ * @param udiff - The unified diff string
  * @param originalContent - The original content of the file.
  * @returns An object with the updated file content and a unified diff string of the changes that were applied.
  * @throws Error if the diff is invalid, targets multiple files, or cannot be applied.
@@ -119,17 +119,40 @@ function applyDiff(
 }
 
 export const description = `
-Apply a unified diff to a single file in the vault. Changes are applied and the resulting diff is returned.
+Edit a single file by applying a unified diff.
 
-Apply a unified diff to a single file in the vault. The diff must be in unified diff format (--- path, +++ path, @@ hunk headers, context/add/remove lines). Example:
+This tool takes a path to a file to edit and the diff to apply to it.
 
---- path/to/file.md
-+++ path/to/file.md
-@@
- context line
--context to remove
-+context to add
- context line
+You must generate a clean, minimal patch that applies successfully to the current file content.
+
+# Instructions for generating diffs:
+
+- Format your response using unified diff format (like \`diff -U0\`, but without line numbers or timestamps).
+- Always begin with exactly two header lines:
+  \`--- path/to/file.ext\`  
+  \`+++ path/to/file.ext\`
+- Then, for each change, include a hunk header line starting with \`@@\`. Line numbers are optional and ignored.
+- Inside hunks:
+  - Prefix unchanged lines with a space: \` \`
+  - Prefix deleted lines with a dash: \`-\`
+  - Prefix added lines with a plus: \`+\`
+- Only include hunks with actual changes — skip hunks with only context lines.
+- Indentation and spacing must be exact.
+- If you're moving content, use one hunk to remove and one hunk to re-add it at the new location.
+
+# Example:
+
+\`\`\`diff
+--- example.md
++++ example.md
+@@ ... @@
+-Old line of text
++New line of text
+\`\`\`
+
+This tool will apply your patch and return a new unified diff showing what actually changed. Make sure your patch applies cleanly — if it doesn't match the file exactly, the edit will fail.
+
+Rollback the change with the rollback tool if you need to.
 `;
 
 export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
