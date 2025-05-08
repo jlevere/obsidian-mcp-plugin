@@ -2,7 +2,6 @@ import { App, PluginSettingTab, Setting, Notice, debounce } from "obsidian";
 import ObsidianMcpPlugin from "./main";
 import { VAULT_TOOLS, TOOL_DESCRIPTIONS } from "./vault/index";
 import { VAULT_RESOURCES, RESOURCE_DESCRIPTIONS } from "./resources";
-import { PLUGIN_NAME } from "./constants";
 import { enableRoarrLogging } from "@logger";
 
 export class ObsidianMcpSettingTab extends PluginSettingTab {
@@ -27,23 +26,16 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     );
   }
 
-  async display(): Promise<void> {
+  display(): void {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h4", { text: PLUGIN_NAME });
-
     this.serverControls(containerEl);
-
-    // Server Settings
     this.displayServerSettings(containerEl);
-
-    // Tools and Resources Sections
     this.displayToolsSection(containerEl);
     this.displayResourcesSection(containerEl);
 
-    // Dynamic Tools Settings
-    await this.displayDynamicToolsSettings(containerEl);
+    void this.displayDynamicToolsSettings(containerEl);
   }
 
   private serverControls(containerEl: HTMLElement): void {
@@ -53,7 +45,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       .addButton((button) =>
         button.setButtonText("Restart Server").onClick(async () => {
           await this.plugin.restartServer();
-          await this.display();
+          this.display();
         })
       );
 
@@ -75,7 +67,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
   }
 
   private displayServerSettings(containerEl: HTMLElement): void {
-    containerEl.createEl("h3", { text: "HTTP Server" });
+    new Setting(containerEl).setName("HTTP Server").setHeading();
 
     new Setting(containerEl)
       .setName("Server Port")
@@ -109,9 +101,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           })
       );
 
-    containerEl.createEl("h4", {
-      text: "Listening Endpoints",
-    });
+    new Setting(containerEl).setName("Listening Endpoints").setHeading();
 
     const createEndpointSetting = (name: string, url: string) => {
       new Setting(containerEl)
@@ -124,8 +114,8 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           button
             .setIcon("copy")
             .setTooltip("Copy URL")
-            .onClick(() => {
-              navigator.clipboard.writeText(url);
+            .onClick(async () => {
+              await navigator.clipboard.writeText(url);
               new Notice(`${name} URL copied to clipboard!`);
             })
         );
@@ -143,7 +133,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     createEndpointSetting("Streamable HTTP", mcpUrl);
     createEndpointSetting("SSE", sseUrl);
 
-    containerEl.createEl("h4", { text: "Authentication" });
+    new Setting(containerEl).setName("Authentication").setHeading();
     new Setting(containerEl)
       .setName("Enable Authentication")
       .setDesc("Require bearer token for all API requests.")
@@ -158,13 +148,13 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
                 value ? "enabled" : "disabled"
               }. Please restart the server to apply changes.`
             );
-            await this.display();
+            this.display();
           })
       );
 
     if (this.plugin.settings.enableAuth) {
       // Masked token display
-      let masked = this.plugin.settings.authToken.replace(/.(?=.{4})/g, "*");
+      const masked = this.plugin.settings.authToken.replace(/.(?=.{4})/g, "*");
       new Setting(containerEl)
         .setName("Auth Token")
         .setDesc(
@@ -175,8 +165,10 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           button
             .setIcon("copy")
             .setTooltip("Copy Token")
-            .onClick(() => {
-              navigator.clipboard.writeText(this.plugin.settings.authToken);
+            .onClick(async () => {
+              await navigator.clipboard.writeText(
+                this.plugin.settings.authToken
+              );
               new Notice("Auth token copied to clipboard!");
             })
         )
@@ -190,7 +182,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
               new Notice(
                 "New auth token generated. Please restart the server."
               );
-              await this.display();
+              this.display();
             })
         );
     }
@@ -199,7 +191,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
   private async displayDynamicToolsSettings(
     containerEl: HTMLElement
   ): Promise<void> {
-    containerEl.createEl("h3", { text: "Dynamic Tools" });
+    new Setting(containerEl).setName("Dynamic Tools").setHeading();
 
     new Setting(containerEl)
       .setName("Enable Dynamic Tools")
@@ -231,7 +223,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     if (this.plugin.settings.enableDynamicTools) {
       const dynamicTools = await this.plugin.toolManager.getDynamicTools();
       if (dynamicTools.length > 0) {
-        containerEl.createEl("h4", { text: "Loaded Dynamic Tools" });
+        new Setting(containerEl).setName("Loaded Dynamic Tools").setHeading();
         const dynamicToolsContainer = containerEl.createDiv();
         dynamicToolsContainer.addClasses(["setting-item-description"]);
         dynamicToolsContainer.style.marginTop = "10px";
@@ -280,7 +272,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
   }
 
   private displayToolsSection(containerEl: HTMLElement): void {
-    containerEl.createEl("h3", { text: "Available Tools" });
+    new Setting(containerEl).setName("Available Tools").setHeading();
 
     Object.keys(VAULT_TOOLS).forEach((toolName) => {
       const description =
@@ -290,7 +282,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
   }
 
   private displayResourcesSection(containerEl: HTMLElement): void {
-    containerEl.createEl("h3", { text: "Available Resources" });
+    new Setting(containerEl).setName("Available Resources").setHeading();
 
     Object.keys(VAULT_RESOURCES).forEach((resourceName) => {
       const description =
