@@ -20,6 +20,6 @@
       "*": ["src/*"]
     }
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "jest.config.ts", "esbuild.config.ts"],
   "exclude": ["**/*.test.ts"]
 }
