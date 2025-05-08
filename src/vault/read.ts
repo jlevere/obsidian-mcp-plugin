@@ -1,4 +1,4 @@
-import { App, TFile, normalizePath } from "obsidian";
+import { App } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { resolveTFileOrError } from "../utils/helpers";
