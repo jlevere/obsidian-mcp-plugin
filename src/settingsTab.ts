@@ -275,9 +275,20 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     new Setting(containerEl).setName("Available Tools").setHeading();
 
     Object.keys(VAULT_TOOLS).forEach((toolName) => {
-      const description =
+      const fullDescription =
         TOOL_DESCRIPTIONS[toolName] ?? "No description available";
-      this.createToggleSetting(containerEl, toolName, description);
+      let shortDescription = fullDescription;
+      if (shortDescription.length > 200) {
+        shortDescription = shortDescription.slice(0, 200) + "...";
+      }
+      this.createToggleSetting(containerEl, toolName, shortDescription);
+      const settingItems = containerEl.querySelectorAll(".setting-item");
+      const lastSetting = settingItems[settingItems.length - 1] as
+        | HTMLElement
+        | undefined;
+      if (lastSetting) {
+        lastSetting.title = fullDescription;
+      }
     });
   }
 
@@ -285,9 +296,20 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     new Setting(containerEl).setName("Available Resources").setHeading();
 
     Object.keys(VAULT_RESOURCES).forEach((resourceName) => {
-      const description =
+      const fullDescription =
         RESOURCE_DESCRIPTIONS[resourceName] ?? "No description available";
-      this.createToggleSetting(containerEl, resourceName, description);
+      let shortDescription = fullDescription;
+      if (shortDescription.length > 200) {
+        shortDescription = shortDescription.slice(0, 200) + "...";
+      }
+      this.createToggleSetting(containerEl, resourceName, shortDescription);
+      const settingItems = containerEl.querySelectorAll(".setting-item");
+      const lastSetting = settingItems[settingItems.length - 1] as
+        | HTMLElement
+        | undefined;
+      if (lastSetting) {
+        lastSetting.title = fullDescription;
+      }
     });
   }
 }
