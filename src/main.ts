@@ -1,9 +1,10 @@
-import { App, Plugin, Notice } from "obsidian";
+import { Plugin, Notice } from "obsidian";
 import { ObsidianMcpSettings } from "@types";
 import { DEFAULT_SETTINGS, PLUGIN_NAME } from "./constants";
 import { ObsidianMcpSettingTab } from "./settingsTab";
 import { ServerManager } from "./managers/ServerManager";
 import { ToolManager } from "./managers/ToolManager";
+import { getErrorMessage } from "./utils/helpers";
 
 export default class ObsidianMcpPlugin extends Plugin {
   settings: ObsidianMcpSettings;
@@ -13,14 +14,11 @@ export default class ObsidianMcpPlugin extends Plugin {
   private isInitialized = false;
 
   async onload() {
-    console.log(`${PLUGIN_NAME} loading...`);
     await this.initializePlugin();
   }
 
-  async onunload() {
-    console.log(`${PLUGIN_NAME} unloading...`);
-    await this.serverManager?.stop();
-    console.log(`${PLUGIN_NAME} unloaded`);
+  onunload() {
+    void this.serverManager?.stop();
   }
 
   private async initializePlugin() {
@@ -30,11 +28,9 @@ export default class ObsidianMcpPlugin extends Plugin {
     this.addSettingTab(new ObsidianMcpSettingTab(this.app, this));
 
     // Defer server startup until Obsidian is ready
-    this.app.workspace.onLayoutReady(() => {
-      this.initializeServer();
+    this.app.workspace.onLayoutReady(async () => {
+      await this.initializeServer();
     });
-
-    console.log(`${PLUGIN_NAME} loaded (server initialization deferred)`);
   }
 
   private initializeManagers() {
@@ -66,20 +62,20 @@ export default class ObsidianMcpPlugin extends Plugin {
     try {
       await this.serverManager.start();
       this.isInitialized = true;
-      console.log(`${PLUGIN_NAME} server initialized`);
     } catch (error) {
-      console.error("Failed to initialize server:", error);
       new Notice(
-        `Failed to initialize ${PLUGIN_NAME} server: ${
-          (error as Error).message
-        }`
+        `Failed to initialize ${PLUGIN_NAME} server: ${getErrorMessage(error)}`
       );
     }
   }
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-    // Generate a token if missing
+    this.settings = Object.assign(
+      {},
+      DEFAULT_SETTINGS,
+      (await this.loadData()) as Partial<ObsidianMcpSettings> // trust the data validates
+    );
+
     if (!this.settings.authToken) {
       this.settings.authToken = crypto.randomUUID();
       await this.saveSettings();
@@ -92,7 +88,6 @@ export default class ObsidianMcpPlugin extends Plugin {
 
   async restartServer() {
     if (this.isRestarting) {
-      console.log("Server restart already in progress");
       return;
     }
 
@@ -107,8 +102,9 @@ export default class ObsidianMcpPlugin extends Plugin {
       await this.serverManager.restart();
       new Notice(`${PLUGIN_NAME} server restarted successfully`);
     } catch (error) {
-      console.error("Failed to restart server:", error);
-      new Notice(`Failed to restart server: ${(error as Error).message}`);
+      const msg = getErrorMessage(error);
+      console.error({ context: msg }, "Failed to restart server");
+      new Notice(`Failed to restart server: ${msg}}`);
     } finally {
       this.isRestarting = false;
     }

@@ -255,9 +255,6 @@ export class ServerManager {
     this.setupSseCleanup(res, transport, keepAliveTimer);
 
     await this.mcpServer?.connect(transport);
-    console.log(
-      `SSE connection established for session ${transport.sessionId}`
-    );
   }
 
   /**
@@ -271,7 +268,6 @@ export class ServerManager {
     res.on("close", () => {
       clearInterval(keepAliveTimer);
       this.mcpTransports.delete(transport.sessionId);
-      console.log(`SSE connection closed for session ${transport.sessionId}`);
     });
   }
 
@@ -344,7 +340,7 @@ export class ServerManager {
       this.httpServer?.listen(port, bindingHost, () => {
         this.httpServer?.removeListener("error", onError);
         console.log(
-          `${PLUGIN_NAME} server listening on ${bindingHost}:${port}`
+          `${PLUGIN_NAME} express server listening on ${bindingHost}:${port}`
         );
         resolve();
       });
@@ -382,7 +378,6 @@ export class ServerManager {
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: () => randomUUID(),
       onsessioninitialized: (sid) => {
-        console.log(`StreamableHTTP session initialized with ID: ${sid}`);
         this.mcpTransports.set(sid, transport);
       },
     });
@@ -390,9 +385,6 @@ export class ServerManager {
     transport.onclose = () => {
       const sid = transport.sessionId;
       if (sid && this.mcpTransports.has(sid)) {
-        console.log(
-          `Transport closed for session ${sid}, removing from transports map`
-        );
         this.mcpTransports.delete(sid);
       }
     };
@@ -466,8 +458,6 @@ export class ServerManager {
     this.mcpServer = null;
     this.httpServer = null;
     this.expressApp = null;
-
-    console.log("Server cleanup completed.");
   }
 
   /**
@@ -488,7 +478,6 @@ export class ServerManager {
       async ([sessionId, transport]) => {
         try {
           await transport.close();
-          console.log(`Transport closed for session ${sessionId}`);
         } catch (e) {
           console.warn(`Error closing transport ${sessionId}:`, e);
         }

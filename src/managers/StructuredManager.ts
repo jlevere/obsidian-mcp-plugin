@@ -75,7 +75,7 @@ ${schema.metadata.description}`,
               return await handleStructuredUpdate(this.app, schema, args);
             }
           );
-          console.log(`Registered structured tool: ${toolName}`);
+          console.log(`${PLUGIN_NAME} Registered structured tool: ${toolName}`);
         } catch (error) {
           console.error(
             `Error registering structured tool ${toolName}:`,

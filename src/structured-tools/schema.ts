@@ -5,6 +5,7 @@ import Ajv from "ajv";
 import metaSchema from "./meta-schema.json";
 import { JSONSchemaToZod } from "@dmitryrechkin/json-schema-to-zod";
 import { z } from "zod";
+import { PLUGIN_NAME } from "../constants";
 
 // Define the structure that matches our meta-schema
 export interface ValidatedSchema {
@@ -15,7 +16,7 @@ export interface ValidatedSchema {
     pathTemplate: string;
     pathComponents: string[];
   };
-  fields: any;
+  fields: Record<string, unknown>;
 }
 
 // Initialize AJV validator with JSON Schema draft-07
@@ -45,7 +46,7 @@ export async function findAndParseSchemas(
 
   if (!schemaFolder) {
     console.log(
-      `Schema directory '${config.schemaDirectory}' not found. Skipping dynamic tool generation.`
+      `${PLUGIN_NAME} Schema directory '${config.schemaDirectory}' not found. Skipping dynamic tool generation.`
     );
     return [];
   }
@@ -111,7 +112,7 @@ export async function findAndParseSchemas(
       }
 
       // At this point TypeScript knows parsedYaml matches ValidatedSchema
-      const validatedYaml = parsedYaml as ValidatedSchema;
+      const validatedYaml = parsedYaml;
 
       validSchemas.push(validatedYaml);
       console.log(
@@ -137,8 +138,6 @@ export function generateZodSchema(schema: ValidatedSchema): z.ZodObject<any> {
   }
 
   try {
-    console.log("Raw schema fields:", schema.fields);
-
     // Extract required fields (non-optional fields)
     const required = Object.entries(schema.fields)
       .filter(([_, field]) => {
@@ -155,12 +154,8 @@ export function generateZodSchema(schema: ValidatedSchema): z.ZodObject<any> {
       additionalProperties: false,
     };
 
-    console.log("Generated JSON Schema:", JSON.stringify(jsonSchema, null, 2));
-
     // Convert JSON Schema to Zod
     const zodSchema = JSONSchemaToZod.convert(jsonSchema);
-    // @ts-ignore shape exists at runtime but TypeScript doesn't know about it
-    console.log("Generated Zod Schema:", zodSchema.shape);
 
     return zodSchema as z.ZodObject<any>;
   } catch (error) {

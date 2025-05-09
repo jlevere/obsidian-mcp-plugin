@@ -2,7 +2,6 @@ import { App, PluginSettingTab, Setting, Notice, debounce } from "obsidian";
 import ObsidianMcpPlugin from "./main";
 import { VAULT_TOOLS, TOOL_DESCRIPTIONS } from "./vault/index";
 import { VAULT_RESOURCES, RESOURCE_DESCRIPTIONS } from "./resources";
-import { enableRoarrLogging } from "@logger";
 
 export class ObsidianMcpSettingTab extends PluginSettingTab {
   plugin: ObsidianMcpPlugin;
@@ -60,8 +59,11 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.enableDebugLogging = value;
             await this.plugin.saveSettings();
-            enableRoarrLogging(value);
-            new Notice(`Debug logging ${value ? "enabled" : "disabled"}`);
+            new Notice(
+              `Debug logging ${
+                value ? "enabled" : "disabled"
+              }. Please restart the server to apply changes.`
+            );
           })
       );
   }
