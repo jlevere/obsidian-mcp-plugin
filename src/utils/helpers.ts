@@ -218,3 +218,9 @@ export function resolveTFileOrError(app: App, path: string) {
   }
   return { file, normPath };
 }
+
+
+export function getErrorMessage(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  return JSON.stringify(e);
+}

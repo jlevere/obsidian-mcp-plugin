@@ -12,6 +12,7 @@ import {
   ServerNotification,
 } from "@modelcontextprotocol/sdk/types";
 import { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
+import { PLUGIN_NAME } from "../constants";
 
 export interface StructuredManagerConfig {
   enabled: boolean;
