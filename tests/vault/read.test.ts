@@ -45,7 +45,7 @@ describe("Vault Read Handler", () => {
 
   it("registers with the correct name and schema", () => {
     expect(mcpServer.tool).toHaveBeenCalledWith(
-      "read-file",
+      "obsidian-mcp-read-file",
       expect.any(String),
       expect.objectContaining({
         path: expect.any(Object), // Zod schema object
