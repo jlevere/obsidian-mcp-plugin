@@ -19,7 +19,7 @@ async function ensureFolder(app: App, folderPath: string) {
 
 export function registerUpsertFileHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "upsert-file",
+    "obsidian-mcp-upsert-file",
     description,
     {
       path: z.string().describe("Path to the file in the vault"),

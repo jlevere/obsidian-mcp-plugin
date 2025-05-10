@@ -157,7 +157,7 @@ Rollback the change with the rollback tool if you need to.
 
 export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "diff-edit-file",
+    "obsidian-mcp-diff-edit-file",
     description,
     {
       path: z.string().describe("Path to the file in the vault"),
@@ -169,7 +169,7 @@ export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
       const { file, normPath } = result;
 
       let fileContent = await app.vault.read(file);
-      await saveRollback(app, normPath, "diff-edit-file");
+      await saveRollback(app, normPath, "obsidian-mcp-diff-edit-file");
       try {
         const { updated, diff } = applyDiff(normPath, udiff, fileContent);
         await app.vault.adapter.write(normPath, updated);

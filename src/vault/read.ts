@@ -12,7 +12,7 @@ If the exact file is not found, will suggest similar files that might match.
 
 export function registerReadHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "read-file",
+    "obsidian-mcp-read-file",
     description,
     {
       path: z.string().describe("Path to the file in the vault"),
@@ -34,9 +34,8 @@ export function registerReadHandler(app: App, mcpServer: McpServer) {
           content: [
             {
               type: "text",
-              text: `Error reading file: ${
-                error instanceof Error ? error.message : String(error)
-              }`,
+              text: `Error reading file: ${error instanceof Error ? error.message : String(error)
+                }`,
             },
           ],
           isError: true,

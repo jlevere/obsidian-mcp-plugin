@@ -28,24 +28,24 @@ import {
 import { ToolRegistry } from "@types";
 
 export const VAULT_TOOLS: ToolRegistry = {
-  "read-file": registerReadHandler,
-  "diff-edit-file": registerDiffEditHandler,
-  "search-contents": registerSearchContentsHandler,
-  "search-filenames": registerSearchFilenamesHandler,
-  tree: registerVaultTreeHandler,
-  "upsert-file": registerUpsertFileHandler,
-  "rollback-edit": registerRollbackEditHandler,
+  "obsidian-mcp-read-file": registerReadHandler,
+  "obsidian-mcp-diff-edit-file": registerDiffEditHandler,
+  "obsidian-mcp-search-contents": registerSearchContentsHandler,
+  "obsidian-mcp-search-filenames": registerSearchFilenamesHandler,
+  "obsidian-mcp-tree": registerVaultTreeHandler,
+  "obsidian-mcp-upsert-file": registerUpsertFileHandler,
+  "obsidian-mcp-rollback-edit": registerRollbackEditHandler,
 };
 
 // Map of tool names to their descriptions
 export const TOOL_DESCRIPTIONS: Record<string, string> = {
-  "read-file": readDescription,
-  "diff-edit-file": diffEditDescription,
-  "search-contents": searchContentsDescription,
-  "search-filenames": searchFilenamesDescription,
-  tree: treeDescription,
-  "upsert-file": upsertDescription,
-  "rollback-edit": rollbackEditDescription,
+  "obsidian-mcp-read-file": readDescription,
+  "obsidian-mcp-diff-edit-file": diffEditDescription,
+  "obsidian-mcp-search-contents": searchContentsDescription,
+  "obsidian-mcp-search-filenames": searchFilenamesDescription,
+  "obsidian-mcp-tree": treeDescription,
+  "obsidian-mcp-upsert-file": upsertDescription,
+  "obsidian-mcp-rollback-edit": rollbackEditDescription,
 } as const;
 
 export function registerVaultTools(app: App, mcpServer: McpServer) {

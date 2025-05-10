@@ -15,7 +15,7 @@ Returns:
 
 export function registerSearchFilenamesHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "search-filenames",
+    "obsidian-mcp-search-filenames",
     description,
     {
       query: z.string().describe("Search query for vault filenames"),
@@ -52,8 +52,7 @@ export function registerSearchFilenamesHandler(app: App, mcpServer: McpServer) {
               text: limitedResults
                 .map(
                   (item) =>
-                    `Match\n\tfilename='${item.filename}', \n\tScore=${
-                      item.score ?? 0
+                    `Match\n\tfilename='${item.filename}', \n\tScore=${item.score ?? 0
                     }`
                 )
                 .join("\n"),

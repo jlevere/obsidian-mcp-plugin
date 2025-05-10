@@ -10,7 +10,7 @@ Restores the file content to the last saved state before a file-writing tool mod
 
 export function registerRollbackEditHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "rollback-edit",
+    "obsidian-mcp-rollback-edit",
     description,
     {
       path: z

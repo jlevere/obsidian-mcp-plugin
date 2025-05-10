@@ -16,7 +16,7 @@ Returns:
 
 export function registerSearchContentsHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "search-contents",
+    "obsidian-mcp-search-contents",
     description,
     {
       query: z.string().describe("Search query for vault"),
@@ -54,8 +54,7 @@ export function registerSearchContentsHandler(app: App, mcpServer: McpServer) {
               text: limitedResults
                 .map(
                   (item) =>
-                    `Match\n\tfilename='${item.filename}', \n\tScore=${
-                      item.score ?? 0
+                    `Match\n\tfilename='${item.filename}', \n\tScore=${item.score ?? 0
                     }`
                 )
                 .join("\n"),

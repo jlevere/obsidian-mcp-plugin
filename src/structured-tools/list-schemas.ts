@@ -22,7 +22,7 @@ export function registerListSchemasHandler(
   config: StructuredManagerConfig
 ): void {
   mcpServer.tool(
-    "list-schemas",
+    "obsidian-mcp-list-schemas",
     description,
     z.object({}).shape,
     async (): Promise<CallToolResult> => {
@@ -54,8 +54,7 @@ export function registerListSchemasHandler(
                 schema.fields as Record<string, SchemaField>
               ).map(
                 ([name, field]) =>
-                  `  - ${name} (${field.type})${
-                    field.required ? "" : " (optional)"
+                  `  - ${name} (${field.type})${field.required ? "" : " (optional)"
                   }: ${field.description || ""}`
               ),
             ].join("\n"),
@@ -66,9 +65,8 @@ export function registerListSchemasHandler(
           content: [
             {
               type: "text",
-              text: `Error listing schemas: ${
-                error instanceof Error ? error.message : String(error)
-              }`,
+              text: `Error listing schemas: ${error instanceof Error ? error.message : String(error)
+                }`,
             },
           ],
           isError: true,

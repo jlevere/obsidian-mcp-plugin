@@ -12,7 +12,7 @@ A "depth" parameter is available to limit how many subfolder levels to include.
 
 export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "tree",
+    "obsidian-mcp-tree",
     description,
     {
       dir: z
@@ -78,9 +78,8 @@ export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
           content: [
             {
               type: "text",
-              text: `Error building directory tree: ${
-                error instanceof Error ? error.message : String(error)
-              }`,
+              text: `Error building directory tree: ${error instanceof Error ? error.message : String(error)
+                }`,
             },
           ],
           isError: true,

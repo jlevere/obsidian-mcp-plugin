@@ -42,7 +42,7 @@ export class StructuredManager {
 
     try {
       // Register list-schemas tool first
-      if (!this.config.disabledTools.has("list-schemas")) {
+      if (!this.config.disabledTools.has("obsidian-mcp-list-schemas")) {
         registerListSchemasHandler(this.app, mcpServer, this.config);
       }
 
@@ -50,7 +50,7 @@ export class StructuredManager {
 
       // Register individual update tools for each schema
       for (const schema of schemas) {
-        const toolName = `update-${schema.metadata.schemaName.toLowerCase()}`;
+        const toolName = `obsidian-mcp-update-${schema.metadata.schemaName.toLowerCase()}`;
 
         // Skip if tool is disabled
         if (this.config.disabledTools.has(toolName)) {
@@ -61,10 +61,8 @@ export class StructuredManager {
           const zodSchema = generateZodSchema(schema);
           mcpServer.tool(
             toolName,
-            `Update ${
-              schema.metadata.schemaName
-            } content using the following template: ${
-              schema.metadata.pathTemplate
+            `Update ${schema.metadata.schemaName
+            } content using the following template: ${schema.metadata.pathTemplate
             }
 Required fields: ${schema.metadata.pathComponents.join(", ")}
 ${schema.metadata.description}`,
@@ -102,9 +100,9 @@ ${schema.metadata.description}`,
     try {
       const schemas = await findAndParseSchemas(this.app, this.config);
       if (schemas.length > 0) {
-        tools.push("list-schemas");
+        tools.push("obsidia-mcp-list-schemas");
         for (const schema of schemas) {
-          const toolName = `update-${schema.metadata.schemaName.toLowerCase()}`;
+          const toolName = `obsidian-mcp-update-${schema.metadata.schemaName.toLowerCase()}`;
           tools.push(toolName);
         }
       }
