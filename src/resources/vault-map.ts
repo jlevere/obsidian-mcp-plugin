@@ -1,10 +1,9 @@
 import { App } from "obsidian";
 import {
   McpServer,
-  ResourceTemplate,
   ResourceMetadata,
 } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { buildVaultTree } from "../utils/helpers";
+import { buildVaultTree, getErrorMessage } from "../utils/helpers";
 
 const resourceUri = "vault://map";
 const resourceName = "Vault Map";
@@ -35,12 +34,12 @@ export function registerVaultMapResource(app: App, mcpServer: McpServer) {
           },
         ],
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         contents: [
           {
             uri: uri.href,
-            text: `Error building vault map: ${error.message}`,
+            text: `Error building vault map: ${getErrorMessage(error)}`,
           },
         ],
         isError: true,

@@ -132,7 +132,9 @@ export async function findAndParseSchemas(
 /**
  * Generates a Zod schema from a schema definition
  */
-export function generateZodSchema(schema: ValidatedSchema): z.ZodObject<any> {
+export function generateZodSchema(
+  schema: ValidatedSchema
+): z.ZodObject<z.ZodRawShape> {
   if (!schema.fields || typeof schema.fields !== "object") {
     throw new Error("Schema fields must be a valid object");
   }
@@ -140,7 +142,7 @@ export function generateZodSchema(schema: ValidatedSchema): z.ZodObject<any> {
   try {
     // Extract required fields (non-optional fields)
     const required = Object.entries(schema.fields)
-      .filter(([_, field]) => {
+      .filter(([, field]) => {
         const typedField = field as { type: string; optional?: boolean };
         return typeof field === "object" && field && !typedField.optional;
       })
@@ -157,7 +159,7 @@ export function generateZodSchema(schema: ValidatedSchema): z.ZodObject<any> {
     // Convert JSON Schema to Zod
     const zodSchema = JSONSchemaToZod.convert(jsonSchema);
 
-    return zodSchema as z.ZodObject<any>;
+    return zodSchema as z.ZodObject<z.ZodRawShape>;
   } catch (error) {
     console.error("Schema generation error:", error);
     throw new Error(

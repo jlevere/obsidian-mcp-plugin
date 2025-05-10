@@ -13,7 +13,7 @@ export const metadata: ResourceMetadata = {
 };
 
 export const registerActiveFileResource = (app: App, mcpServer: McpServer) =>
-  mcpServer.resource(resourceName, resourceUri, metadata, async (uri) => {
+  mcpServer.resource(resourceName, resourceUri, metadata, (uri) => {
     try {
       const file = app.workspace.getActiveFile();
       if (!file) {
@@ -28,7 +28,7 @@ export const registerActiveFileResource = (app: App, mcpServer: McpServer) =>
         };
       }
 
-      const fileMetadata = await getFileMetadataObject(app, file);
+      const fileMetadata = getFileMetadataObject(app, file);
       const content = JSON.stringify(fileMetadata);
 
       return { contents: [{ uri: uri.href, text: content }] };

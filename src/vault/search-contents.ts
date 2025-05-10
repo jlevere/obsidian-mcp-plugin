@@ -1,7 +1,8 @@
-import { App, prepareFuzzySearch, TFile } from "obsidian";
+import { App, prepareFuzzySearch } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { SearchResponseItem } from "@types";
+import { getErrorMessage } from "utils/helpers";
 
 export const description = `
 Performs a fuzzy search contents across all files in the vault.
@@ -61,12 +62,12 @@ export function registerSearchContentsHandler(app: App, mcpServer: McpServer) {
             },
           ],
         };
-      } catch (error) {
+      } catch (error: unknown) {
         return {
           content: [
             {
               type: "text",
-              text: `Error processing fuzzy search: ${error.message}`,
+              text: `Error processing fuzzy search: ${getErrorMessage(error)}`,
             },
           ],
           isError: true,

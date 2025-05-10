@@ -62,7 +62,7 @@ export async function handleStructuredUpdate(
     if (!schema.metadata.pathComponents.includes(identifierField)) {
       targetPath = targetPath.replace(
         `\${${identifierField}}`,
-        String(inputArgs[identifierField])
+        String(inputArgs[identifierField]) // eslint-disable-line @typescript-eslint/no-base-to-string
       );
     }
 

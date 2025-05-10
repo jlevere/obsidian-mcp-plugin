@@ -1,7 +1,8 @@
-import { App, prepareFuzzySearch, TFile } from "obsidian";
+import { App, prepareFuzzySearch } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { SearchResponseItem } from "@types";
+import { getErrorMessage } from "utils/helpers";
 
 export const description = `
 Performs a fuzzy search across all file names in the vault.
@@ -25,7 +26,7 @@ export function registerSearchFilenamesHandler(app: App, mcpServer: McpServer) {
         .default(5)
         .describe("Maximum number of results to return"),
     },
-    async ({ query, limit }) => {
+    ({ query, limit }) => {
       try {
         const search = prepareFuzzySearch(query);
         const results: SearchResponseItem[] = [];
@@ -59,12 +60,12 @@ export function registerSearchFilenamesHandler(app: App, mcpServer: McpServer) {
             },
           ],
         };
-      } catch (error) {
+      } catch (error: unknown) {
         return {
           content: [
             {
               type: "text",
-              text: `Error processing fuzzy search: ${error.message}`,
+              text: `Error processing fuzzy search: ${getErrorMessage(error)}`,
             },
           ],
           isError: true,

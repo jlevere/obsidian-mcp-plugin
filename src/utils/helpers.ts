@@ -14,10 +14,10 @@ import {
   TreeBuildOptions,
 } from "@types";
 
-export async function getFileMetadataObject(
+export function getFileMetadataObject(
   app: App,
   file: TFile
-): Promise<FileMetadataObject> {
+): FileMetadataObject {
   const cache = app.metadataCache.getFileCache(file);
   const tags = cache?.tags?.map((tag) => tag.tag) || [];
   const frontmatter = cache?.frontmatter || {};
@@ -81,7 +81,7 @@ export async function buildVaultTree(
     };
 
     if (includeMetadata) {
-      const metadata = await getFileMetadataObject(app, file);
+      const metadata = getFileMetadataObject(app, file);
       return {
         ...baseNode,
         tags: metadata.tags,
@@ -218,7 +218,6 @@ export function resolveTFileOrError(app: App, path: string) {
   }
   return { file, normPath };
 }
-
 
 export function getErrorMessage(e: unknown): string {
   if (e instanceof Error) return e.message;

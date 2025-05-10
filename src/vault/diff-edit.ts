@@ -1,7 +1,11 @@
-import { App, TFile, normalizePath } from "obsidian";
+import { App } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { resolveTFileOrError, saveRollback } from "../utils/helpers";
+import {
+  getErrorMessage,
+  resolveTFileOrError,
+  saveRollback,
+} from "../utils/helpers";
 import { createPatch } from "diff";
 
 /**
@@ -177,12 +181,12 @@ export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
           content: [{ type: "text", text: diff }],
           isError: false,
         };
-      } catch (err: any) {
+      } catch (error: unknown) {
         return {
           content: [
             {
               type: "text",
-              text: `Error applying diff: ${err.message || err}`,
+              text: `Error applying diff: ${getErrorMessage(error)}`,
             },
           ],
           isError: true,

@@ -6,12 +6,7 @@ import {
 } from "../structured-tools/schema";
 import { handleStructuredUpdate } from "../structured-tools/crud-handler";
 import { registerListSchemasHandler } from "../structured-tools/list-schemas";
-import {
-  CallToolResult,
-  ServerRequest,
-  ServerNotification,
-} from "@modelcontextprotocol/sdk/types";
-import { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types";
 import { PLUGIN_NAME } from "../constants";
 
 export interface StructuredManagerConfig {
@@ -67,10 +62,7 @@ export class StructuredManager {
 Required fields: ${schema.metadata.pathComponents.join(", ")}
 ${schema.metadata.description}`,
             zodSchema.shape,
-            async (
-              args: Record<string, unknown>,
-              extra: RequestHandlerExtra<ServerRequest, ServerNotification>
-            ): Promise<CallToolResult> => {
+            async (args: Record<string, unknown>): Promise<CallToolResult> => {
               return await handleStructuredUpdate(this.app, schema, args);
             }
           );

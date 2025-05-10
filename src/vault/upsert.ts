@@ -1,7 +1,7 @@
 import { App, TFile, normalizePath } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { saveRollback } from "../utils/helpers";
+import { saveRollback, getErrorMessage } from "../utils/helpers";
 
 export const description = `
   Upserts a file in the vault. If the file doesn't exist, it is created with the provided content. 
@@ -10,8 +10,13 @@ export const description = `
 async function ensureFolder(app: App, folderPath: string) {
   try {
     await app.vault.createFolder(folderPath);
-  } catch (err: any) {
-    if (!err?.message?.includes("already exists")) {
+  } catch (err: unknown) {
+    let alreadyExists = false;
+    if (err && typeof err === "object" && "message" in err) {
+      const msgString = getErrorMessage((err as { message?: unknown }).message);
+      alreadyExists = msgString.includes("already exists");
+    }
+    if (!alreadyExists) {
       throw err;
     }
   }
@@ -64,12 +69,12 @@ export function registerUpsertFileHandler(app: App, mcpServer: McpServer) {
             content: [{ type: "text", text: `File created: ${normPath}` }],
           };
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         return {
           content: [
             {
               type: "text",
-              text: `Error processing file upsert: ${error.message}`,
+              text: `Error processing file upsert: ${getErrorMessage(error)}`,
             },
           ],
           isError: true,

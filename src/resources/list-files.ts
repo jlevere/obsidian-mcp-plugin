@@ -1,7 +1,6 @@
 import { App, TFile } from "obsidian";
 import {
   McpServer,
-  ResourceMetadata,
   ResourceTemplate,
 } from "@modelcontextprotocol/sdk/server/mcp.js";
 
@@ -10,7 +9,7 @@ export function registerFileResources(app: App, mcpServer: McpServer) {
   mcpServer.resource(
     "Files List: Returns list of file resources.",
     new ResourceTemplate("files://", {
-      list: async () => {
+      list: () => {
         try {
           const files = app.vault.getFiles();
           return {
@@ -30,7 +29,7 @@ export function registerFileResources(app: App, mcpServer: McpServer) {
       mimeType: "application/json",
       description: "Lists all files in the Obsidian vault",
     },
-    async (uri: URL) => {
+    () => {
       return { contents: [] }; // List-only resource, no content for direct access
     }
   );

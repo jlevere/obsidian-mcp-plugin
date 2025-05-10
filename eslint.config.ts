@@ -12,6 +12,7 @@ export default tsEslint.config(
       "obs-api.d.ts",
       "mocks/obsidian.ts",
       "main.js",
+      "tests/**/*.ts",
     ],
   },
   eslint.configs.recommended,
@@ -20,16 +21,8 @@ export default tsEslint.config(
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        project: "./tsconfig.json",
         tsconfigRootDir: import.meta.dirname,
-      },
-    },
-  },
-  {
-    files: ["tests/**/*.ts"],
-    languageOptions: {
-      parserOptions: {
-        project: "./tsconfig.test.json",
       },
     },
   }

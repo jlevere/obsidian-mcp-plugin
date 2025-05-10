@@ -29,7 +29,7 @@ export interface ToolRegistration {
   name: string;
   description: string;
   type: "static" | "dynamic" | "resource";
-  register: (app: any, mcpServer: any) => void;
+  register: (app: App, mcpServer: McpServer) => void;
 }
 
 export interface FileMetadataObject {

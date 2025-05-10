@@ -6,6 +6,7 @@ import express from "express";
 import { Request, Response, NextFunction } from "express";
 import type { RequestHandler } from "express";
 import * as http from "http";
+import * as net from "net";
 import { randomUUID } from "crypto";
 import { ServerConfig } from "@types";
 import { PLUGIN_NAME } from "../constants";
@@ -81,7 +82,16 @@ export class ServerManager {
       this.expressApp.use(express.json());
 
       // Initialize server
-      this.httpServer = http.createServer(this.expressApp);
+      this.httpServer = http.createServer((req, res) => {
+        // @ts-expect-error: express types
+        this.expressApp(req, res, (err: unknown) => {
+          if (err) {
+            console.error("Express error:", err);
+            res.statusCode = 500;
+            res.end("Internal Server Error");
+          }
+        });
+      });
       this.mcpServer = new McpServer({
         name: PLUGIN_NAME,
         version: this.version,
@@ -204,7 +214,9 @@ export class ServerManager {
     if (
       !sessionId &&
       req.method === "POST" &&
-      req.body?.method === "initialize"
+      typeof req.body === "object" &&
+      req.body !== null &&
+      (req.body as { method?: unknown }).method === "initialize"
     ) {
       return this.createNewStreamableTransport();
     }
@@ -350,10 +362,10 @@ export class ServerManager {
   /**
    * Helper method to get an existing transport by session ID.
    */
-  private async getExistingTransport(
+  private getExistingTransport(
     sessionId: string,
     res: express.Response
-  ): Promise<StreamableHTTPServerTransport | null> {
+  ): StreamableHTTPServerTransport | null {
     const existingTransport = this.mcpTransports.get(sessionId);
     if (existingTransport instanceof StreamableHTTPServerTransport) {
       return existingTransport;
@@ -396,7 +408,7 @@ export class ServerManager {
   /**
    * Helper method to configure SSE socket parameters.
    */
-  private configureSseSocket(socket: any): void {
+  private configureSseSocket(socket: net.Socket): void {
     socket.setTimeout(0);
     socket.setNoDelay(true);
     socket.setKeepAlive(true);
@@ -430,7 +442,7 @@ export class ServerManager {
   /**
    * Helper method to handle transport errors.
    */
-  private handleTransportError(error: any, res: express.Response): void {
+  private handleTransportError(error: unknown, res: express.Response): void {
     console.error("Error handling MCP request:", error);
     if (!res.headersSent) {
       res.status(500).json({
@@ -463,7 +475,7 @@ export class ServerManager {
   /**
    * Clears the keep-alive interval.
    */
-  private async clearKeepAlive(): Promise<void> {
+  private clearKeepAlive(): void {
     if (this.keepAliveInterval) {
       clearInterval(this.keepAliveInterval);
       this.keepAliveInterval = null;
@@ -495,7 +507,7 @@ export class ServerManager {
     // Close MCP server
     if (this.mcpServer) {
       try {
-        this.mcpServer.close();
+        await this.mcpServer.close();
       } catch (e) {
         console.warn("Error closing MCP server:", e);
       }
