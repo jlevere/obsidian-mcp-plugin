@@ -6,7 +6,6 @@ export const DEFAULT_SETTINGS: ObsidianMcpSettings = {
   disabledTools: [],
   enableDynamicTools: false,
   dynamicToolsPath: "metadata/schemas",
-  enableDebugLogging: false,
   enableAuth: false,
   authToken: "",
 };

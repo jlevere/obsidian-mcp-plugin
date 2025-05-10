@@ -47,25 +47,6 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           this.display();
         })
       );
-
-    new Setting(containerEl)
-      .setName("Enable Debug Logging")
-      .setDesc(
-        "Enable logging to console using roarr (ctrl+shift+i to view console)"
-      )
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.enableDebugLogging)
-          .onChange(async (value) => {
-            this.plugin.settings.enableDebugLogging = value;
-            await this.plugin.saveSettings();
-            new Notice(
-              `Debug logging ${
-                value ? "enabled" : "disabled"
-              }. Please restart the server to apply changes.`
-            );
-          })
-      );
   }
 
   private displayServerSettings(containerEl: HTMLElement): void {

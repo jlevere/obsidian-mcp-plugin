@@ -13,7 +13,6 @@ export interface ObsidianMcpSettings {
   disabledTools: string[];
   enableDynamicTools: boolean;
   dynamicToolsPath: string;
-  enableDebugLogging: boolean;
   enableAuth: boolean;
   authToken: string;
 }
