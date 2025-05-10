@@ -85,15 +85,15 @@ You can find the correct url from the plugin's setting pannel under endpoints.
 
 ### Available Tools
 
-- `read-file`: Get file contents
-- `diff-edit-file`: Smart, context-aware file updates using patch blocks (see below for usage)
-- `search-contents`: Fuzzy search across the contents of all files in your vault
-- `search-filenames`: Fuzzy search across all file names in your vault
-- `vault-tree`: Browse vault structure
-- `upsert-file`: Create or update files
-- `rollback-edit`: Roll back the last edit to a markdown file (reverts the last change made by supported tools)
+- `obsidian-mcp-read-file`: Get file contents
+- `obsidian-mcp-diff-edit-file`: Smart, context-aware file updates using patch blocks (see below for usage)
+- `obsidian-mcp-search-contents`: Fuzzy search across the contents of all files in your vault
+- `obsidian-mcp-search-filenames`: Fuzzy search across all file names in your vault
+- `obsidian-mcp-vault-tree`: Browse vault structure
+- `obsidian-mcp-upsert-file`: Create or update files
+- `obsidian-mcp-rollback-edit`: Roll back the last edit to a markdown file (reverts the last change made by supported tools)
 
-#### `diff-edit-file`
+#### `obsidian-mcp-diff-edit-file`
 
 This tool allows you to update a section of a file by providing a snippet (the "original") and the new content (the "updated"). The tool will locate the original block in the file using fuzzy matching and replace it with your updated version. This is safer and more robust than replacing the whole file or relying on line numbers.
 
@@ -114,9 +114,9 @@ This tool allows you to update a section of a file by providing a snippet (the "
 
 If the block is found and the patch is valid, only that section will be updated. If the file is empty, the updated content will be written as the new file content.
 
-#### `rollback-edit`
+#### `obsidian-mcp-rollback-edit`
 
-This tool allows you to revert the last change made to a markdown file by supported file-writing tools (`diff-edit-file`, `upsert-file`, or structured update tools). Before any of these tools modify a file, the previous content is saved in a rollback store. You can use `rollback-edit` to restore the file to its previous state.
+This tool allows you to revert the last change made to a markdown file by supported file-writing tools (`obsidian-mcp-diff-edit-file`, `obsidian-mcp-upsert-file`, or structured update tools). Before any of these tools modify a file, the previous content is saved in a rollback store. You can use `obsidian-mcp-rollback-edit` to restore the file to its previous state.
 
 **How to use:**
 
