@@ -128,9 +128,6 @@ export async function findAndParseSchemas(
       if (!allPathComponentsPresent) continue;
 
       validSchemas.push(validatedYaml);
-      console.log(
-        `Successfully parsed and validated schema: ${validatedYaml.metadata.schemaName} from ${file.path}`
-      );
     } catch (error) {
       console.error(
         `Unexpected error processing schema file ${file.path}:`,

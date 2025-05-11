@@ -56,8 +56,10 @@ export class StructuredManager {
           const zodSchema = generateZodSchema(schema);
           mcpServer.tool(
             toolName,
-            `Update ${schema.metadata.schemaName
-            } content using the following template: ${schema.metadata.pathTemplate
+            `Update ${
+              schema.metadata.schemaName
+            } content using the following template: ${
+              schema.metadata.pathTemplate
             }
 Required fields: ${schema.metadata.pathComponents.join(", ")}
 ${schema.metadata.description}`,
@@ -66,7 +68,6 @@ ${schema.metadata.description}`,
               return await handleStructuredUpdate(this.app, schema, args);
             }
           );
-          console.log(`${PLUGIN_NAME} Registered structured tool: ${toolName}`);
         } catch (error) {
           console.error(
             `Error registering structured tool ${toolName}:`,

@@ -21,7 +21,7 @@ way for applications to interact with your vault.
 
 ## Features
 
-- **Embeded MCP Server:** Hosts the MCP server within Obsidian itself as a plugin, simplifying setup and improving performance
+- **Embedded MCP Server:** Hosts the MCP server within Obsidian itself as a plugin, simplifying setup and improving performance
 - **Vault Access via MCP:** Exposes your vault through standardized tools
 - **Structured Data Support:** Define custom schemas for structured note creation and validation
 - **File Operations:**
@@ -88,7 +88,7 @@ Here is an example claude_desktop_config.json to use `mcp-remote` local proxy.
 }
 ```
 
-You can find the correct url from the plugin's setting pannel under endpoints.
+You can find the correct url from the plugin's setting panel under endpoints.
 
 ### Available Tools
 
@@ -100,11 +100,11 @@ You can find the correct url from the plugin's setting pannel under endpoints.
 - `obsidian-mcp-upsert-file`: Create or update files
 - `obsidian-mcp-rollback-edit`: Roll back the last edit to a markdown file (reverts the last change made by supported tools)
 
-# Highlighed tools
+# Highlighted tools
 
 #### `obsidian-mcp-diff-edit-file`
 
-This tool edits a single file by applying a simplified udiff. This is basically how Cursor and other LLM based code editors work. It is best for smarter models, as smaller ones tend to struggle to create the diffs acruately. To help with this problem, the tool returns a diff of the actual changes applied to the file. This helps the model to know that what got changed was what it expected or not.
+This tool edits a single file by applying a simplified udiff. This is basically how Cursor and other LLM based code editors work. It is best for smarter models, as smaller ones tend to struggle to create the diffs accurately. To help with this problem, the tool returns a diff of the actual changes applied to the file. This helps the model determine whether the changes applied matched its expectations.
 
 An example of this simplified udiff format is as follows:
 
@@ -116,7 +116,7 @@ An example of this simplified udiff format is as follows:
 +New line of text
 ```
 
-This simplified diff system is borrowed heavily from Aider, you can read more about their work [here](https://aider.chat/2023/12/21/unified-diffs.html)
+This simplified diff system is inspired by Aider's simplified diff format, you can read more about their work [here](https://aider.chat/2023/12/21/unified-diffs.html)
 
 #### `obsidian-mcp-rollback-edit`
 
@@ -126,9 +126,9 @@ If a rollback is available, the file will be restored to its previous content, a
 
 ## Structured Data Edits (dynamic tools)
 
-Create and update structured content in a typesafe manner using tool.
+Create and update structured content in a typesafe manner using tools.
 
-tl:dr
+TL;DR
   LLMs are unreliable at directly editing structured formats like JSON or YAML. They break formatting or forget fields. Instead, Vault MCP defines a schema for your data and exposes it as a tool. The model then edits the structure via tool calls.
 
 If you want to write a schema go here: [Write Your Own Schemas](#writing-your-own-schemas)
@@ -139,7 +139,7 @@ LLMs are just bad at working with structured data. They break formatting, inject
 
 Vault MCP takes a somewhat novel approach to dealing with structured data, it creates a tool that the LLM can call to make updates to a data structure.
 
-When the LLM wants to edit the structured data, it makes a tool call where the paramiters of the tool call corrispond to the fields of the data structure.
+When the LLM wants to edit the structured data, it makes a tool call where the parameters of the tool call correspond to the fields of the data structure.
 
 Most "good" models are trained specifically to make tool calls so this is a much more stable system.
 
@@ -158,7 +158,7 @@ Each schema has two sections:
 2. `fields`
   Defines the structure of your data (used to generate the Zod tool)
 
-The schemas are json schema draft 07, but witten in yaml for better usability. To be able to do this dynamic tool generation, the plugin needs to know both the structure of the structured data, but also some metadata about file names, locations etc.
+The schemas are json schema draft 07, but written in yaml for better usability. To be able to do this dynamic tool generation, the plugin needs to know both the structure of the structured data, but also some metadata about file names, locations etc.
 
 #### User Schemas
 
@@ -230,9 +230,9 @@ This generates an MCP tool that looks like this:
 
 ![mcp-schema-tool](./docs/schema-mcp-tool.png)
 
-When you use it to put data into obsidan the result looks like this:
+When you use it to put data into Obsidian the result looks like this:
 
-![obsidnan-schema-tool](./docs/schema-obsidian-tool.png)
+![Obsidian-schema-tool](./docs/schema-obsidian-tool.png)
 
 </details>
 
@@ -347,7 +347,7 @@ Place the schema that you write into a "schema" directory in your obsidian vault
 
 There can be other text in the same markdown such as notes or descriptions, but Vault MCP will only use the yaml defined in the specified codeblock above.
 
-Place this directory path into the dynamic tools settings in Vault MCP settings and restart the plugin to parse and generate the dynamic tools. They will populate in the settings pannel like this:
+Place this directory path into the dynamic tools settings in Vault MCP settings and restart the plugin to parse and generate the dynamic tools. They will populate in the settings panel like this:
 
 ![dynamic settings](./docs/obsidian-settings-dynamic.png)
 
@@ -363,24 +363,20 @@ When writing schemas, I found this tool particularly helpful [stefanterdell.gith
 
 - Basic knowledge of TypeScript and [Obsidian API](https://github.com/obsidianmd/obsidian-api)
 
-A nix flake is provided to create a standarized development environment.
+A nix flake is provided to create a standardized development environment.
 
 ### Setup Development Environment
 
 ```bash
 
-# Clone the repository
-
-git clone https://github.com/yourusername/obsidian-mcp-plugin.git
+git clone https://github.com/jlevere/obsidian-mcp-plugin.git
 cd obsidian-mcp-plugin
 
-# Install dependencies
+echo "use flake" > .envrc && direnv allow
 
 pnpm install
 
-# Start development build
-
-pnpm run dev
+pnpm dev
 ```
 
 ### Project Structure
@@ -395,18 +391,7 @@ pnpm run dev
 ### Building
 
 ```bash
-
-# Production build
-
 pnpm run build
-
-# Run tests
-
-pnpm test
-
-# Package for distribution
-
-pnpm run package
 ```
 
 ## Contributing
