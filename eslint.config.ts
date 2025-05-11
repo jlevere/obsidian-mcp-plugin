@@ -25,5 +25,5 @@ export default tsEslint.config(
         tsconfigRootDir: import.meta.dirname,
       },
     },
-  }
+  },
 );

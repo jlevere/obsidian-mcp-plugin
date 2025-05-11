@@ -55,8 +55,9 @@ export function registerSearchContentsHandler(app: App, mcpServer: McpServer) {
               text: limitedResults
                 .map(
                   (item) =>
-                    `Match\n\tfilename='${item.filename}', \n\tScore=${item.score ?? 0
-                    }`
+                    `Match\n\tfilename='${item.filename}', \n\tScore=${
+                      item.score ?? 0
+                    }`,
                 )
                 .join("\n"),
             },
@@ -73,6 +74,6 @@ export function registerSearchContentsHandler(app: App, mcpServer: McpServer) {
           isError: true,
         };
       }
-    }
+    },
   );
 }

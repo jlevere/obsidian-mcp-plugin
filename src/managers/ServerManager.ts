@@ -38,7 +38,7 @@ export class ServerManager {
   constructor(
     private readonly app: App,
     private config: ServerConfig,
-    private readonly version: string
+    private readonly version: string,
   ) {}
 
   /**
@@ -106,8 +106,8 @@ export class ServerManager {
       this.expressApp.use(
         bearerAuth(
           () => (this.config.enableAuth ? this.config.authToken : null),
-          PLUGIN_NAME
-        )
+          PLUGIN_NAME,
+        ),
       );
 
       // Setup routes
@@ -118,7 +118,7 @@ export class ServerManager {
     } catch (error) {
       console.error(`Error starting ${PLUGIN_NAME} server:`, error);
       new Notice(
-        `Error starting ${PLUGIN_NAME} server: ${(error as Error).message}`
+        `Error starting ${PLUGIN_NAME} server: ${(error as Error).message}`,
       );
       // Clean up on error
       await this.stop();
@@ -191,7 +191,7 @@ export class ServerManager {
         } catch (error) {
           this.handleTransportError(error, res);
         }
-      }
+      },
     );
   }
 
@@ -201,7 +201,7 @@ export class ServerManager {
    */
   private async resolveStreamableTransport(
     req: express.Request,
-    res: express.Response
+    res: express.Response,
   ): Promise<StreamableHTTPServerTransport | null> {
     const sessionId = req.headers["mcp-session-id"] as string | undefined;
 
@@ -239,7 +239,7 @@ export class ServerManager {
         }
 
         await this.setupSseConnection(req, res);
-      }
+      },
     );
   }
 
@@ -248,7 +248,7 @@ export class ServerManager {
    */
   private async setupSseConnection(
     req: express.Request,
-    res: express.Response
+    res: express.Response,
   ): Promise<void> {
     // Set headers for SSE
     Object.entries(this.DEFAULT_HEADERS).forEach(([key, value]) => {
@@ -276,7 +276,7 @@ export class ServerManager {
   private setupSseCleanup(
     res: express.Response,
     transport: SSEServerTransport,
-    keepAliveTimer: NodeJS.Timeout
+    keepAliveTimer: NodeJS.Timeout,
   ): void {
     res.on("close", () => {
       clearInterval(keepAliveTimer);
@@ -300,7 +300,7 @@ export class ServerManager {
         if (!transport) return;
 
         await transport.handlePostMessage(req, res, req.body);
-      }
+      },
     );
   }
 
@@ -310,7 +310,7 @@ export class ServerManager {
    */
   private resolveSseTransport(
     req: express.Request,
-    res: express.Response
+    res: express.Response,
   ): SSEServerTransport | null {
     const sessionId = req.query.sessionId as string;
     const transport = this.mcpTransports.get(sessionId);
@@ -353,7 +353,7 @@ export class ServerManager {
       this.httpServer?.listen(port, bindingHost, () => {
         this.httpServer?.removeListener("error", onError);
         console.log(
-          `${PLUGIN_NAME} express server listening on ${bindingHost}:${port}`
+          `${PLUGIN_NAME} express server listening on ${bindingHost}:${port}`,
         );
         resolve();
       });
@@ -365,7 +365,7 @@ export class ServerManager {
    */
   private getExistingTransport(
     sessionId: string,
-    res: express.Response
+    res: express.Response,
   ): StreamableHTTPServerTransport | null {
     const existingTransport = this.mcpTransports.get(sessionId);
     if (existingTransport instanceof StreamableHTTPServerTransport) {
@@ -388,7 +388,7 @@ export class ServerManager {
    * Helper method to create a new StreamableHTTP transport.
    */
   private async createNewStreamableTransport(
-    req: express.Request
+    req: express.Request,
   ): Promise<StreamableHTTPServerTransport> {
     this.showClientConnectedNotice(req);
     const transport = new StreamableHTTPServerTransport({
@@ -497,7 +497,7 @@ export class ServerManager {
         } catch (e) {
           console.warn(`Error closing transport ${sessionId}:`, e);
         }
-      }
+      },
     );
 
     await Promise.all(closePromises);
@@ -550,14 +550,14 @@ export class ServerManager {
         type:
           transport instanceof SSEServerTransport ? "SSE" : "StreamableHTTP",
         connected: true,
-      })
+      }),
     );
   }
 }
 
 export function bearerAuth(
   getToken: () => string | null | undefined,
-  realm = "MCP"
+  realm = "MCP",
 ): RequestHandler {
   return (req: Request, res: Response, next: NextFunction) => {
     try {

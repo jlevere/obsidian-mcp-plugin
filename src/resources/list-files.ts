@@ -31,7 +31,7 @@ export function registerFileResources(app: App, mcpServer: McpServer) {
     },
     () => {
       return { contents: [] }; // List-only resource, no content for direct access
-    }
+    },
   );
 
   // Resource 2: Read contents of a specific file
@@ -98,6 +98,6 @@ export function registerFileResources(app: App, mcpServer: McpServer) {
           isError: true,
         };
       }
-    }
+    },
   );
 }

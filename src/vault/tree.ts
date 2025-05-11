@@ -19,7 +19,7 @@ export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
         .string()
         .optional()
         .describe(
-          "Path to the directory in the vault to tree; if omitted, the vault root is used."
+          "Path to the directory in the vault to tree; if omitted, the vault root is used.",
         ),
       depth: z
         .number()
@@ -28,7 +28,7 @@ export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
         .optional()
         .transform((val) => val ?? Infinity)
         .describe(
-          "Recursion level for subfolders. Use 0 to return only the current folder, 1 to include immediate children, etc. Defaults to full recursion."
+          "Recursion level for subfolders. Use 0 to return only the current folder, 1 to include immediate children, etc. Defaults to full recursion.",
         ),
     },
     async ({ dir, depth }) => {
@@ -43,7 +43,7 @@ export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
               {
                 type: "text",
                 text: `Directory not found or is not a folder: ${normalizePath(
-                  dir || "/"
+                  dir || "/",
                 )}`,
               },
             ],
@@ -78,13 +78,14 @@ export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
           content: [
             {
               type: "text",
-              text: `Error building directory tree: ${error instanceof Error ? error.message : String(error)
-                }`,
+              text: `Error building directory tree: ${
+                error instanceof Error ? error.message : String(error)
+              }`,
             },
           ],
           isError: true,
         };
       }
-    }
+    },
   );
 }

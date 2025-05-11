@@ -65,12 +65,12 @@ ${schema.metadata.description}`,
             zodSchema.shape,
             async (args: Record<string, unknown>): Promise<CallToolResult> => {
               return await handleStructuredUpdate(this.app, schema, args);
-            }
+            },
           );
         } catch (error) {
           console.error(
             `Error registering structured tool ${toolName}:`,
-            error
+            error,
           );
         }
       }

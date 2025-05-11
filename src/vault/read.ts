@@ -34,13 +34,14 @@ export function registerReadHandler(app: App, mcpServer: McpServer) {
           content: [
             {
               type: "text",
-              text: `Error reading file: ${error instanceof Error ? error.message : String(error)
-                }`,
+              text: `Error reading file: ${
+                error instanceof Error ? error.message : String(error)
+              }`,
             },
           ],
           isError: true,
         };
       }
-    }
+    },
   );
 }

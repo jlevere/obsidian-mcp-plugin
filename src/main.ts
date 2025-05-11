@@ -43,7 +43,7 @@ export default class ObsidianMcpPlugin extends Plugin {
         enableAuth: this.settings.enableAuth,
         authToken: this.settings.authToken,
       },
-      this.manifest.version
+      this.manifest.version,
     );
   }
 
@@ -64,7 +64,7 @@ export default class ObsidianMcpPlugin extends Plugin {
       this.isInitialized = true;
     } catch (error) {
       new Notice(
-        `Failed to initialize ${PLUGIN_NAME} server: ${getErrorMessage(error)}`
+        `Failed to initialize ${PLUGIN_NAME} server: ${getErrorMessage(error)}`,
       );
     }
   }
@@ -73,7 +73,7 @@ export default class ObsidianMcpPlugin extends Plugin {
     this.settings = Object.assign(
       {},
       DEFAULT_SETTINGS,
-      (await this.loadData()) as Partial<ObsidianMcpSettings> // trust the data validates
+      (await this.loadData()) as Partial<ObsidianMcpSettings>, // trust the data validates
     );
 
     if (!this.settings.authToken) {

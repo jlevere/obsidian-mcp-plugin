@@ -80,6 +80,6 @@ export function registerUpsertFileHandler(app: App, mcpServer: McpServer) {
           isError: true,
         };
       }
-    }
+    },
   );
 }

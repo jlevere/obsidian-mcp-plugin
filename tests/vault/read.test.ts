@@ -50,7 +50,7 @@ describe("Vault Read Handler", () => {
       expect.objectContaining({
         path: expect.any(Object), // Zod schema object
       }),
-      expect.any(Function)
+      expect.any(Function),
     );
   });
 
@@ -68,7 +68,7 @@ describe("Vault Read Handler", () => {
         signal: mockAbortSignal,
         sendNotification: jest.fn(),
         sendRequest: jest.fn(),
-      }
+      },
     );
 
     expect(result).toEqual({
@@ -95,7 +95,7 @@ describe("Vault Read Handler", () => {
         signal: mockAbortSignal,
         sendNotification: jest.fn(),
         sendRequest: jest.fn(),
-      }
+      },
     );
 
     const errorResult = result.error as {
@@ -127,7 +127,7 @@ describe("Vault Read Handler", () => {
         signal: mockAbortSignal,
         sendNotification: jest.fn(),
         sendRequest: jest.fn(),
-      }
+      },
     );
 
     const errorResult = result.error as {
@@ -136,7 +136,7 @@ describe("Vault Read Handler", () => {
     };
     expect(errorResult.isError).toBe(true);
     expect(errorResult.content[0].text).toContain(
-      "Path exists but is a folder"
+      "Path exists but is a folder",
     );
   });
 });

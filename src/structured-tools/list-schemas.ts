@@ -19,7 +19,7 @@ Lists all available schemas and their details. Each schema defines a data struct
 export function registerListSchemasHandler(
   app: App,
   mcpServer: McpServer,
-  config: StructuredManagerConfig
+  config: StructuredManagerConfig,
 ): void {
   mcpServer.tool(
     "obsidian-mcp-list-schemas",
@@ -51,11 +51,12 @@ export function registerListSchemasHandler(
               `Required Fields: ${schema.metadata.pathComponents.join(", ")}`,
               `Fields:`,
               ...Object.entries(
-                schema.fields as Record<string, SchemaField>
+                schema.fields as Record<string, SchemaField>,
               ).map(
                 ([name, field]) =>
-                  `  - ${name} (${field.type})${field.required ? "" : " (optional)"
-                  }: ${field.description || ""}`
+                  `  - ${name} (${field.type})${
+                    field.required ? "" : " (optional)"
+                  }: ${field.description || ""}`,
               ),
             ].join("\n"),
           })),
@@ -65,13 +66,14 @@ export function registerListSchemasHandler(
           content: [
             {
               type: "text",
-              text: `Error listing schemas: ${error instanceof Error ? error.message : String(error)
-                }`,
+              text: `Error listing schemas: ${
+                error instanceof Error ? error.message : String(error)
+              }`,
             },
           ],
           isError: true,
         };
       }
-    }
+    },
   );
 }

@@ -38,6 +38,6 @@ export function registerRollbackEditHandler(app: App, mcpServer: McpServer) {
           isError: true,
         };
       }
-    }
+    },
   );
 }

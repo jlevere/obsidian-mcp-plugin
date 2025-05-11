@@ -10,13 +10,13 @@ import { saveRollback } from "../utils/helpers";
 export async function handleStructuredUpdate(
   app: App,
   schema: ValidatedSchema,
-  inputArgs: Record<string, unknown>
+  inputArgs: Record<string, unknown>,
 ): Promise<CallToolResult> {
   try {
     // 1. Validate required path components and identifier field
     const missingPathComponents = schema.metadata.pathComponents.filter(
       (component) =>
-        !(component in inputArgs) || typeof inputArgs[component] !== "string"
+        !(component in inputArgs) || typeof inputArgs[component] !== "string",
     );
 
     if (missingPathComponents.length > 0) {
@@ -25,7 +25,7 @@ export async function handleStructuredUpdate(
           {
             type: "text",
             text: `Missing or invalid path components: ${missingPathComponents.join(
-              ", "
+              ", ",
             )}`,
           },
         ],
@@ -54,7 +54,7 @@ export async function handleStructuredUpdate(
     for (const component of schema.metadata.pathComponents) {
       targetPath = targetPath.replace(
         `\${${component}}`,
-        inputArgs[component] as string
+        inputArgs[component] as string,
       );
     }
 
@@ -62,7 +62,7 @@ export async function handleStructuredUpdate(
     if (!schema.metadata.pathComponents.includes(identifierField)) {
       targetPath = targetPath.replace(
         `\${${identifierField}}`,
-        String(inputArgs[identifierField]) // eslint-disable-line @typescript-eslint/no-base-to-string
+        String(inputArgs[identifierField]), // eslint-disable-line @typescript-eslint/no-base-to-string
       );
     }
 

@@ -16,7 +16,7 @@ import {
 
 export function getFileMetadataObject(
   app: App,
-  file: TFile
+  file: TFile,
 ): FileMetadataObject {
   const cache = app.metadataCache.getFileCache(file);
   const tags = cache?.tags?.map((tag) => tag.tag) || [];
@@ -36,7 +36,7 @@ export function getFileMetadataObject(
 export function findSimilarFiles(
   app: App,
   targetPath: string,
-  limit = 3
+  limit = 3,
 ): { path: string; score: number }[] {
   const search = prepareFuzzySearch(targetPath);
   const results: { path: string; score: number }[] = [];
@@ -66,7 +66,7 @@ export function findSimilarFiles(
 export async function buildVaultTree(
   app: App,
   file: TAbstractFile,
-  options: TreeBuildOptions = {}
+  options: TreeBuildOptions = {},
 ): Promise<TreeNode | null> {
   const { includeMetadata = false, maxDepth = Infinity } = options;
   const currentDepth = maxDepth;
@@ -106,12 +106,12 @@ export async function buildVaultTree(
           buildVaultTree(app, child, {
             ...options,
             maxDepth: currentDepth - 1,
-          })
-        )
+          }),
+        ),
       );
       // Filter out null values and assert type
       node.children = node.children.filter(
-        (child): child is TreeNode => child !== null
+        (child): child is TreeNode => child !== null,
       );
     }
 
@@ -151,7 +151,7 @@ export async function saveRollback(app: App, path: string, reason: string) {
  */
 export async function restoreRollback(
   app: App,
-  path: string
+  path: string,
 ): Promise<{ success: boolean; message: string }> {
   const normPath = normalizePath(path);
   const entry = rollbackStore[normPath];
@@ -164,7 +164,7 @@ export async function restoreRollback(
   }
   await app.vault.modify(file, entry.content);
   const msg = `Rollback successful. Timestamp: ${new Date(
-    entry.timestamp
+    entry.timestamp,
   ).toISOString()}, Reason: ${entry.reason}`;
   delete rollbackStore[normPath];
   return { success: true, message: msg };

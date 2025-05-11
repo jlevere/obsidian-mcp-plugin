@@ -36,7 +36,7 @@ const validateSchema = ajv.compile<ValidatedSchema>(metaSchema);
  */
 export async function findAndParseSchemas(
   app: App,
-  config: StructuredManagerConfig
+  config: StructuredManagerConfig,
 ): Promise<ValidatedSchema[]> {
   const validSchemas: ValidatedSchema[] = [];
   const targetFolderPath = normalizePath(config.schemaDirectory);
@@ -46,14 +46,14 @@ export async function findAndParseSchemas(
 
   if (!schemaFolder) {
     console.log(
-      `${PLUGIN_NAME} Schema directory '${config.schemaDirectory}' not found. Skipping dynamic tool generation.`
+      `${PLUGIN_NAME} Schema directory '${config.schemaDirectory}' not found. Skipping dynamic tool generation.`,
     );
     return [];
   }
 
   // Filter for Markdown files directly within the schema folder
   const schemaFiles = schemaFolder.children.filter(
-    (file): file is TFile => file instanceof TFile && file.extension === "md"
+    (file): file is TFile => file instanceof TFile && file.extension === "md",
   );
 
   for (const file of schemaFiles) {
@@ -64,7 +64,7 @@ export async function findAndParseSchemas(
 
       if (!match || !match[1]) {
         console.warn(
-          `Skipping file ${file.path}: No 'yaml schema' code block found.`
+          `Skipping file ${file.path}: No 'yaml schema' code block found.`,
         );
         continue;
       }
@@ -77,7 +77,7 @@ export async function findAndParseSchemas(
         console.warn(
           `Skipping file ${file.path}: Failed to parse YAML content. Error: ${
             yamlError instanceof Error ? yamlError.message : String(yamlError)
-          }`
+          }`,
         );
         continue;
       }
@@ -88,7 +88,7 @@ export async function findAndParseSchemas(
         !("fields" in parsedYaml)
       ) {
         console.warn(
-          `Skipping file ${file.path}: Parsed YAML must have a fields section`
+          `Skipping file ${file.path}: Parsed YAML must have a fields section`,
         );
         continue;
       }
@@ -97,7 +97,7 @@ export async function findAndParseSchemas(
       if (!ajv.validateSchema(parsedYaml)) {
         console.warn(
           `Skipping file ${file.path}: Invalid JSON Schema:`,
-          ajv.errors
+          ajv.errors,
         );
         continue;
       }
@@ -106,7 +106,7 @@ export async function findAndParseSchemas(
       if (!validateSchema(parsedYaml)) {
         console.warn(
           `Skipping file ${file.path}: Schema validation failed:`,
-          validateSchema.errors
+          validateSchema.errors,
         );
         continue;
       }
@@ -119,7 +119,7 @@ export async function findAndParseSchemas(
       for (const component of meta.pathComponents) {
         if (!(component in fields)) {
           console.warn(
-            `Skipping file ${file.path}: metadata.pathComponents "${component}" is not present in fields.`
+            `Skipping file ${file.path}: metadata.pathComponents "${component}" is not present in fields.`,
           );
           allPathComponentsPresent = false;
           break;
@@ -131,7 +131,7 @@ export async function findAndParseSchemas(
     } catch (error) {
       console.error(
         `Unexpected error processing schema file ${file.path}:`,
-        error
+        error,
       );
     }
   }
@@ -143,7 +143,7 @@ export async function findAndParseSchemas(
  * Generates a Zod schema from a schema definition
  */
 export function generateZodSchema(
-  schema: ValidatedSchema
+  schema: ValidatedSchema,
 ): z.ZodObject<z.ZodRawShape> {
   if (!schema.fields || typeof schema.fields !== "object") {
     throw new Error("Schema fields must be a valid object");
@@ -175,7 +175,7 @@ export function generateZodSchema(
     throw new Error(
       `Failed to generate Zod schema: ${
         error instanceof Error ? error.message : String(error)
-      }`
+      }`,
     );
   }
 }

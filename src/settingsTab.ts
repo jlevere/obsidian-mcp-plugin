@@ -18,11 +18,11 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
         await this.plugin.saveSettings();
         this.plugin.toolManager.updateSettings(this.plugin.settings);
         new Notice(
-          "Schema path changed. Please restart the server to apply changes."
+          "Schema path changed. Please restart the server to apply changes.",
         );
       },
       2000,
-      true
+      true,
     );
   }
 
@@ -50,7 +50,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           .onClick(async () => {
             await this.plugin.restartServer();
             this.display();
-          })
+          }),
       );
   }
 
@@ -71,13 +71,13 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
             } else if (value) {
               new Notice("Port must be a number");
             }
-          })
+          }),
       );
 
     new Setting(containerEl)
       .setName("Binding host")
       .setDesc(
-        "Host to bind the server to (0.0.0.0 for all interfaces, 127.0.0.1 for localhost only)"
+        "Host to bind the server to (0.0.0.0 for all interfaces, 127.0.0.1 for localhost only)",
       )
       .addText((text) =>
         text
@@ -86,7 +86,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.bindingHost = value;
             await this.plugin.saveSettings();
-          })
+          }),
       );
 
     new Setting(containerEl).setName("Listening endpoints").setHeading();
@@ -102,7 +102,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
             .onClick(async () => {
               await navigator.clipboard.writeText(url);
               new Notice(`${name} URL copied to clipboard!`);
-            })
+            }),
         );
     };
 
@@ -131,10 +131,10 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
             new Notice(
               `Authentication ${
                 value ? "enabled" : "disabled"
-              }. Please restart the server to apply changes.`
+              }. Please restart the server to apply changes.`,
             );
             this.display();
-          })
+          }),
       );
 
     if (this.plugin.settings.enableAuth) {
@@ -143,7 +143,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Auth token")
         .setDesc(
-          "Clients must send this token in the 'Authorization: Bearer <token>' HTTP header."
+          "Clients must send this token in the 'Authorization: Bearer <token>' HTTP header.",
         )
         .addText((text) => text.setValue(masked).setDisabled(true))
         .addButton((button) =>
@@ -152,10 +152,10 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
             .setTooltip("Copy token")
             .onClick(async () => {
               await navigator.clipboard.writeText(
-                this.plugin.settings.authToken
+                this.plugin.settings.authToken,
               );
               new Notice("Auth token copied to clipboard!");
-            })
+            }),
         )
         .addButton((button) =>
           button
@@ -165,16 +165,16 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
               this.plugin.settings.authToken = crypto.randomUUID();
               await this.plugin.saveSettings();
               new Notice(
-                "New auth token generated. Please restart the server."
+                "New auth token generated. Please restart the server.",
               );
               this.display();
-            })
+            }),
         );
     }
   }
 
   private async displayDynamicToolsSettings(
-    containerEl: HTMLElement
+    containerEl: HTMLElement,
   ): Promise<void> {
     new Setting(containerEl).setName("Dynamic tools").setHeading();
 
@@ -188,9 +188,9 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
             this.plugin.settings.enableDynamicTools = value;
             await this.plugin.saveSettings();
             new Notice(
-              "Dynamic tools setting changed. Please restart the server to apply changes."
+              "Dynamic tools setting changed. Please restart the server to apply changes.",
             );
-          })
+          }),
       );
 
     new Setting(containerEl)
@@ -202,7 +202,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.dynamicToolsPath)
           .onChange((value: string) => {
             this.debouncedSave(value);
-          })
+          }),
       );
 
     if (this.plugin.settings.enableDynamicTools) {
@@ -213,7 +213,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           this.createToggleSetting(
             containerEl,
             toolName,
-            `Dynamic tool: ${toolName}`
+            `Dynamic tool: ${toolName}`,
           );
         }
       } else {
@@ -227,7 +227,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
   private createToggleSetting(
     containerEl: HTMLElement,
     name: string,
-    description: string
+    description: string,
   ) {
     new Setting(containerEl)
       .setName(name)
@@ -241,9 +241,9 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
               this.plugin.toolManager.getDisabledTools();
             await this.plugin.saveSettings();
             new Notice(
-              `Settings changed. Please restart the server to apply changes.`
+              `Settings changed. Please restart the server to apply changes.`,
             );
-          })
+          }),
       );
   }
 
@@ -310,7 +310,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     new Setting(containerEl).addButton((button) =>
       button.setButtonText("Refresh sessions").onClick(() => {
         this.display();
-      })
+      }),
     );
   }
 }
