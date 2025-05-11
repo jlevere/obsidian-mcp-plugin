@@ -15,7 +15,7 @@ way for applications to interact with your vault.
 [Features](#features) •
 [Usage](#usage) •
 [Development](#development) •
-[Schema Guide](#schema-guide)
+[Schema Guide](#schemas)
 
 ![obsidian-settings](./docs/obsidian-settings.png)
 
