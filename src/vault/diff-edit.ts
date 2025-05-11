@@ -172,7 +172,7 @@ export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
       if ("error" in result) return result;
       const { file, normPath } = result;
 
-      let fileContent = await app.vault.read(file);
+      const fileContent = await app.vault.read(file);
       await saveRollback(app, normPath, "obsidian-mcp-diff-edit-file");
       try {
         const { updated, diff } = applyDiff(normPath, udiff, fileContent);

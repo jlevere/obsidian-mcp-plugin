@@ -13,6 +13,7 @@
     "build": "pnpm tsc -noEmit -skipLibCheck && npx tsx esbuild.config.ts production",
     "build:dev": "pnpm tsc -noEmit -skipLibCheck && npx tsx esbuild.config.ts",
     "test": "pnpm jest",
+    "lint": "pnpm eslint",
     "inspect": "npx @modelcontextprotocol/inspector pnpm node main.js",
     "package": "pnpm build && zip plugin.zip dist/main.js manifest.json"
   },
