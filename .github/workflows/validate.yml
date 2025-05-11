@@ -5,7 +5,7 @@ on:
   - pull_request
 
 jobs:
-  install:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,23 +24,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-  lint:
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
       - name: Run lint
         run: pnpm lint
 
-  test:
-    runs-on: ubuntu-latest
-    needs: lint
-    steps:
       - name: Run tests
         run: pnpm test
 
-  format:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
       - name: Run format
         run: pnpm format
