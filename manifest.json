@@ -4,6 +4,6 @@
 	"version": "0.0.5",
 	"minAppVersion": "1.8.0",
 	"description": "Allow an AI to interact with your vault's notes through a self-contained MCP server",
-	"author": "jlevere",
+	"author": "jlevere & @joshtmerrill",
 	"isDesktopOnly": true
 }

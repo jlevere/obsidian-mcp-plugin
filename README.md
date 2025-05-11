@@ -38,6 +38,12 @@ way for applications to interact with your vault.
 
 ![auth-settings](./docs/obsidian-settings-auth.png)
 
+## Background
+
+Vault MCP started as a small component of a larger project that needed an alternative to traditional RAG methods. It needed something LLMs could use to reliably retrieve and update structured, human-readable data, without relying on unpredictable vector databases or embedding fuzziness.
+
+Existing Obsidian MCP servers weren’t a great fit. They were REST-heavy, complex, and not well-suited for language models to interact with naturally. So this plugin was spun off to solve that: a lightweight interface for working with Obsidian vaults in a way that’s natural for LLMs and transparent for humans.
+
 ## Installation
 
 ### Community Plugins (Recommended)
