@@ -212,26 +212,17 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       const dynamicTools = await this.plugin.toolManager.getDynamicTools();
       if (dynamicTools.length > 0) {
         new Setting(containerEl).setName("Loaded Dynamic Tools").setHeading();
-        const dynamicToolsContainer = containerEl.createDiv();
-        dynamicToolsContainer.addClasses(["setting-item-description"]);
-        dynamicToolsContainer.style.marginTop = "10px";
-        dynamicToolsContainer.style.marginLeft = "10px";
-
         for (const toolName of dynamicTools) {
           this.createToggleSetting(
-            dynamicToolsContainer,
+            containerEl,
             toolName,
             `Dynamic tool: ${toolName}`
           );
         }
       } else {
-        const noToolsMsg = containerEl.createDiv();
-        noToolsMsg.addClasses(["setting-item-description"]);
-        noToolsMsg.style.marginTop = "10px";
-        noToolsMsg.style.marginLeft = "10px";
-        noToolsMsg.createSpan({
-          text: "No dynamic tools found in the schema directory.",
-        });
+        new Setting(containerEl)
+          .setDesc("No dynamic tools found in the schema directory.")
+          .setClass("setting-item-description");
       }
     }
   }
