@@ -57,13 +57,15 @@ way for applications to interact with your vault.
 
 ### Basic Setup
 
-1. Enable the plugin in Obsidian's Community Plugins section.
-2. Navigate to the plugin settings.
-3. Configure the **Server Port** and **Binding Host**. The default port is `3000`, and the default host `127.0.0.1` binds to the local network. Use `0.0.0.0` to make it available to other machines.
-4. **(Optional) Enable Authentication:**
-   - For endpoint security, you can enable Bearer token authentication. Toggle **Enable Authentication** in the settings.
-   - A unique **Auth Token** will be displayed. Clients must include this token in the `Authorization` HTTP header like so: `Authorization: Bearer <your_token>`.
-5. **Restart the Server:** Use the "Restart Server" button in the settings to apply any changes to the port, host, or authentication settings.
+1. Enable the plugin in Obsidian's Community Plugins section
+2. Open plugin settings to configure:
+  - **Server Port** (default: `3000`)
+  - **Binding Host** (default: 127.0.0.1; use 0.0.0.0 for LAN access)
+3. **(Optional) Enable Authentication:**
+   - Toggle **Enable Authentication**
+   - Copy the provided **Auth Token**
+   - Include the token in HTTP headers: `Authorization: Bearer <your_token>`
+4. Click Restart Server to apply changes
 
 ### Connection Methods
 
@@ -87,14 +89,14 @@ You can find the correct url from the plugin's setting pannel under endpoints.
 ### Available Tools
 
 - `obsidian-mcp-read-file`: Get file contents
-- `obsidian-mcp-diff-edit-file`: Smart, context-aware file updates using patch blocks (see below for usage)
+- `obsidian-mcp-diff-edit-file`: Edit files using simplified udiff (see [below](#obsidian-mcp-diff-edit-file))
 - `obsidian-mcp-search-contents`: Fuzzy search across the contents of all files in your vault
 - `obsidian-mcp-search-filenames`: Fuzzy search across all file names in your vault
 - `obsidian-mcp-vault-tree`: Browse vault structure
 - `obsidian-mcp-upsert-file`: Create or update files
 - `obsidian-mcp-rollback-edit`: Roll back the last edit to a markdown file (reverts the last change made by supported tools)
 
-# Interesting tools
+# Highlighed tools
 
 #### `obsidian-mcp-diff-edit-file`
 
@@ -120,20 +122,45 @@ If a rollback is available, the file will be restored to its previous content, a
 
 ## Structured Data Edits (dynamic tools)
 
-### Schema Guide
+Create and update structured content in a typesafe manner using tool.
 
-The plugin supports structured data through JSON Schema-based definitions. This enables type-safe note creation and validation.
+tl:dr
+  LLMs are unreliable at directly editing structured formats like JSON or YAML. They break formatting or forget fields. Instead, Vault MCP defines a schema for your data and exposes it as a tool. The model then edits the structure via tool calls.
 
-This allows llms to create and update structured data without breaking it.
+If you want to write a schema go here: [Write Your Own Schemas](#writing-your-own-schemas)
 
-In an essense, you describe a document and interface using yaml which is converted to jsonschema, validated, and used to generate zod interfaces for MCP tools.
+### How it works
 
-`yaml -> jsonschema -> zod -> MCP tool`
+LLMs are just bad at working with structured data. They break formatting, inject their own formatting, forget things, etc.
 
-#### Examples
+Vault MCP takes a somewhat novel approach to dealing with structured data, it creates a tool that the LLM can call to make updates to a data structure.
 
-Create a new markdown file in your schema directory (default: `metadata/schemas`) with a YAML schema block:#
+When the LLM wants to edit the structured data, it makes a tool call where the paramiters of the tool call corrispond to the fields of the data structure.
 
+Most "good" models are trained specifically to make tool calls so this is a much more stable system.
+
+This mapping of the structured data to the tool is done in a few steps
+1. You define a schema using JSON Schema (draft-07), written in YAML.
+2. Vault MCP validates it using a built-in [metaschema](#meta-schema)
+3. The schema is converted to a [zod](https://github.com/colinhacks/zod)
+3. A tool is dynamically created from that schema
+
+
+### Schemas
+
+Each schema has two sections:
+1. `metadata`
+  Defines file naming and storage details
+2. `fields`
+  Defines the structure of your data (used to generate the Zod tool)
+
+The schemas are json schema draft 07, but witten in yaml for better usability. To be able to do this dynamic tool generation, the plugin needs to know both the structure of the structured data, but also some metadata about file names, locations etc.
+
+#### User Schemas
+
+<details>
+  <summary>Here is an example of a user defined schema for storing recipes</summary>
+  
 ```yaml
 metadata:
   schemaName: "Recipe"
@@ -191,6 +218,7 @@ fields:
           description: "Amount needed (e.g., `2 cups`, `1 tsp`)."
           optional: true
 
+          
 ---
 ```
 
@@ -202,24 +230,114 @@ When you use it to put data into obsidan the result looks like this:
 
 ![obsidnan-schema-tool](./docs/schema-obsidian-tool.png)
 
-#### Schema Validation
+</details>
 
-Schemas are validated against:
 
-1. JSON Schema specification (draft-07)
-2. Plugin's [meta-schema](./src/structured-tools/meta-schema.json) for compliance with structure and zod types
+#### Meta Schema
+
+
+To validate that the user defined schema contains the required components we have a meta schema defined in json schema. [You can read the file here](./src/structured-tools/meta-schema.json)
+
+It also helps narrow the types to something that can be converted into zod more clearly.
+
+You can use it to see a list of types and modifiers you can use such as `default` values, `minimum` and `maximum` etc.
+
+<details>
+  <summary>Here is the yaml version of the meta schema</summary>
+
+```yaml
+"$schema": http://json-schema.org/draft-07/schema#
+title: MCP Structured Document Schema (JSON Schema Valid)
+description: Strict meta-schema for structured tools using zod compatible fields.
+type: object
+required:
+  - metadata
+  - fields
+properties:
+metadata:
+  type: object
+  required:
+    - schemaName
+    - description
+    - identifierField
+    - pathTemplate
+    - pathComponents
+  properties:
+    schemaName:
+      type: string
+    description:
+      type: string
+    identifierField:
+      type: string
+    pathTemplate:
+      type: string
+    pathComponents:
+      type: array
+      items:
+        type: string
+  additionalProperties: false
+fields:
+  type: object
+  patternProperties:
+    "^[a-zA-Z_][a-zA-Z0-9_]*$":
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - string
+            - number
+            - boolean
+            - date
+            - array
+            - object
+            - literal
+            - unknown
+            - any
+        description:
+          type: string
+        default: {}
+        minimum:
+          type: number
+        maximum:
+          type: number
+        enum:
+          type: array
+          items: {}
+        items:
+          type: object
+        properties:
+          type: object
+        required:
+          type: array
+          items:
+            type: string
+      additionalProperties: true
+  additionalProperties: false
+additionalProperties: false
+```
+
+</details>
 
 #### Writing your own schemas
 
-There are two parts to the schemas.
+Start by thinking about two things:
 
-The `metadata` section, which describes the name of the file, the location, and importantly, what keys are used as identifiers.
+- `Where and how will the file be stored?`
 
-The `fields` section, this describes your actual document. It will be represented as a yaml like document and stored in markdown. Obsidian is able to render this yaml like document and nicely embed it.
+Use metadata to describe filename templates and how to identify a file (e.g. by ID).
 
-The `fields` section is used to generate the `zod` schema which creates the MCP tool interface. So, you are simultainiously defining your data and also the interface to interact with it.
+- `What structured data will be in the file?`
 
-This gives you access to many of `zods` features though, such as `minimum`/`maximum` `default` etc.
+Use fields to define the structure using types like string, number, array, object, and modifiers like default, minimum, etc.
+
+Once defined, your schema will automatically become a tool the LLM can use to update that file type.
+
+Obsidian will render the YAML structure as a nicely formatted frontmatter or embedded block in your markdown.
+
+When writing schemas, I found this tool particularly helpful [stefanterdell.github.io/json-schema-to-zod-react](https://stefanterdell.github.io/json-schema-to-zod-react/). Vault MCP uses this internally to generate the `zod` but this is a more visual method to help in troubleshooting.
 
 ## Development
 
@@ -283,7 +401,7 @@ pnpm run package
 
 ## Credits
 
-- Based on [obsidian-local-rest-api](https://github.com/coddingtonbear/obsidian-local-rest-api) by [coddingtonbear](https://github.com/coddingtonbear)
+- Inspired by [obsidian-local-rest-api](https://github.com/coddingtonbear/obsidian-local-rest-api) by [coddingtonbear](https://github.com/coddingtonbear)
 - Uses [Model Context Protocol](https://github.com/modelcontextprotocol/protocol) for AI interactions
 
 ## License
