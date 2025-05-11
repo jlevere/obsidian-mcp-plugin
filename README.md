@@ -23,14 +23,15 @@ way for applications to interact with your vault.
 
 ## Features
 
-- **Direct MCP Server:** Hosts the MCP server within Obsidian itself, simplifying setup and improving performance
+- **Embeded MCP Server:** Hosts the MCP server within Obsidian itself as a plugin, simplifying setup and improving performance
 - **Vault Access via MCP:** Exposes your vault through standardized tools
 - **Structured Data Support:** Define custom schemas for structured note creation and validation
 - **File Operations:**
-  - Read and write files with smart diffing
+  - Read and write files
   - Fuzzy search across your vault
   - Navigate vault structure programmatically
-- **Configurable:** Customize server settings (port, host), tool availability, and security
+  - Structured data storage and access
+- **Configurable:** Customize server settings, tool availability, and authentication
 - **Optional Authentication:** Secure your server with optional Bearer token authentication.
 
 ![tool-selection](./docs/obsidian-settings-tools.png)
@@ -42,7 +43,7 @@ way for applications to interact with your vault.
 ### Community Plugins (Recommended)
 
 1. Open Obsidian Settings > Community Plugins
-2. Search for "MCP Plugin"
+2. Search for "Vault MCP"
 3. Click Install, then Enable
 4. Configure settings as needed
 
@@ -58,7 +59,7 @@ way for applications to interact with your vault.
 
 1. Enable the plugin in Obsidian's Community Plugins section.
 2. Navigate to the plugin settings.
-3. Configure the **Server Port** and **Binding Host**. The default port is `3000`, and the default host `0.0.0.0` binds to all network interfaces. Use `127.0.0.1` to restrict access to your local machine only.
+3. Configure the **Server Port** and **Binding Host**. The default port is `3000`, and the default host `127.0.0.1` binds to the local network. Use `0.0.0.0` to make it available to other machines.
 4. **(Optional) Enable Authentication:**
    - For endpoint security, you can enable Bearer token authentication. Toggle **Enable Authentication** in the settings.
    - A unique **Auth Token** will be displayed. Clients must include this token in the `Authorization` HTTP header like so: `Authorization: Bearer <your_token>`.
@@ -68,7 +69,7 @@ way for applications to interact with your vault.
 
 The plugin currently only supports Server-Sent Events (SSE) and StreamHTTP connections. For applications that require stdio connections (like Claude Desktop), you'll need to use a proxy. You can follow [Cloudflare's guide](https://developers.cloudflare.com/agents/guides/test-remote-mcp-server/#connect-your-remote-mcp-server-to-claude-desktop-via-a-local-proxy) on setting up a local proxy using [`mcp-remote`](https://www.npmjs.com/package/mcp-remote).
 
-Here is an example claude_desktop_config.json to use Cloudflare's local proxy.
+Here is an example claude_desktop_config.json to use `mcp-remote` local proxy.
 
 ```json
 {
@@ -93,98 +94,33 @@ You can find the correct url from the plugin's setting pannel under endpoints.
 - `obsidian-mcp-upsert-file`: Create or update files
 - `obsidian-mcp-rollback-edit`: Roll back the last edit to a markdown file (reverts the last change made by supported tools)
 
+# Interesting tools
+
 #### `obsidian-mcp-diff-edit-file`
 
-This tool allows you to update a section of a file by providing a snippet (the "original") and the new content (the "updated"). The tool will locate the original block in the file using fuzzy matching and replace it with your updated version. This is safer and more robust than replacing the whole file or relying on line numbers.
+This tool edits a single file by applying a simplified udiff. This is basically how Cursor and other LLM based code editors work. It is best for smarter models, as smaller ones tend to struggle to create the diffs acruately. To help with this problem, the tool returns a diff of the actual changes applied to the file. This helps the model to know that what got changed was what it expected or not.
 
-**How to use:**
+An example of this simplified udiff format is as follows:
 
-- **original**: A copy-pasted snippet from your file — include enough surrounding lines to give unique context so the tool can reliably fuzzy-match it.
-- **updated**: The new version you want to replace it with.
-
-**Example:**
-
-```json
-{
-  "path": "Notes/Example.md",
-  "original": "def greet():\n    return 'Hello'",
-  "updated": "def greet():\n    return 'Hi there!'"
-}
+```diff
+--- example.md
++++ example.md
+@@ ... @@
+-Old line of text
++New line of text
 ```
 
-If the block is found and the patch is valid, only that section will be updated. If the file is empty, the updated content will be written as the new file content.
+This simplified diff system is borrowed heavily from Aider, you can read more about their work [here](https://aider.chat/2023/12/21/unified-diffs.html)
 
 #### `obsidian-mcp-rollback-edit`
 
 This tool allows you to revert the last change made to a markdown file by supported file-writing tools (`obsidian-mcp-diff-edit-file`, `obsidian-mcp-upsert-file`, or structured update tools). Before any of these tools modify a file, the previous content is saved in a rollback store. You can use `obsidian-mcp-rollback-edit` to restore the file to its previous state.
 
-**How to use:**
-
-- **path**: The path to the markdown file you want to roll back (must end with `.md`).
-
-**Example:**
-
-```json
-{
-  "path": "Notes/Example.md"
-}
-```
-
 If a rollback is available, the file will be restored to its previous content, and you'll get a message with the timestamp and reason for the last change. If not, you'll get an error message.
 
-## Development
+## Structured Data Edits (dynamic tools)
 
-### Prerequisites
-
-- Basic knowledge of TypeScript and [Obsidian API](https://github.com/obsidianmd/obsidian-api)
-
-A nix flake is provided to create a standarized development environment.
-
-### Setup Development Environment
-
-```bash
-
-# Clone the repository
-
-git clone https://github.com/yourusername/obsidian-mcp-plugin.git
-cd obsidian-mcp-plugin
-
-# Install dependencies
-
-pnpm install
-
-# Start development build
-
-pnpm run dev
-```
-
-### Project Structure
-
-- `src/`: Source code
-  - `managers/`: Core functionality managers
-  - `structured-tools/`: Schema validation and tools
-  - `utils/`: Helper utilities
-  - `vault/`: Vault interaction code
-- `tests/`: Test files
-
-### Building
-
-```bash
-
-# Production build
-
-pnpm run build
-
-# Run tests
-
-pnpm test
-
-# Package for distribution
-
-pnpm run package
-```
-
-## Schema Guide
+### Schema Guide
 
 The plugin supports structured data through JSON Schema-based definitions. This enables type-safe note creation and validation.
 
@@ -194,11 +130,9 @@ In an essense, you describe a document and interface using yaml which is convert
 
 `yaml -> jsonschema -> zod -> MCP tool`
 
-### Examples
+#### Examples
 
-Create a new markdown file in your schema directory (default: `metadata/schemas`) with a YAML schema block:
-
-##
+Create a new markdown file in your schema directory (default: `metadata/schemas`) with a YAML schema block:#
 
 ```yaml
 metadata:
@@ -268,14 +202,14 @@ When you use it to put data into obsidan the result looks like this:
 
 ![obsidnan-schema-tool](./docs/schema-obsidian-tool.png)
 
-### Schema Validation
+#### Schema Validation
 
 Schemas are validated against:
 
 1. JSON Schema specification (draft-07)
 2. Plugin's [meta-schema](./src/structured-tools/meta-schema.json) for compliance with structure and zod types
 
-### Writing your own schemas
+#### Writing your own schemas
 
 There are two parts to the schemas.
 
@@ -286,6 +220,58 @@ The `fields` section, this describes your actual document. It will be represente
 The `fields` section is used to generate the `zod` schema which creates the MCP tool interface. So, you are simultainiously defining your data and also the interface to interact with it.
 
 This gives you access to many of `zods` features though, such as `minimum`/`maximum` `default` etc.
+
+## Development
+
+### Prerequisites
+
+- Basic knowledge of TypeScript and [Obsidian API](https://github.com/obsidianmd/obsidian-api)
+
+A nix flake is provided to create a standarized development environment.
+
+### Setup Development Environment
+
+```bash
+
+# Clone the repository
+
+git clone https://github.com/yourusername/obsidian-mcp-plugin.git
+cd obsidian-mcp-plugin
+
+# Install dependencies
+
+pnpm install
+
+# Start development build
+
+pnpm run dev
+```
+
+### Project Structure
+
+- `src/`: Source code
+  - `managers/`: Core functionality managers
+  - `structured-tools/`: Schema validation and tools
+  - `utils/`: Helper utilities
+  - `vault/`: Vault interaction code
+- `tests/`: Test files
+
+### Building
+
+```bash
+
+# Production build
+
+pnpm run build
+
+# Run tests
+
+pnpm test
+
+# Package for distribution
+
+pnpm run package
+```
 
 ## Contributing
 
