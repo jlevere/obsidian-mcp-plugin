@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Test](https://github.com/jlevere/obsidian-mcp-plugin/actions/workflows/test.yml/badge.svg)](https://github.com/jlevere/obsidian-mcp-plugin/actions/workflows/test.yml)
+[![Validate](https://github.com/jlevere/obsidian-mcp-plugin/actions/workflows/validate.yml/badge.svg)](https://github.com/jlevere/obsidian-mcp-plugin/actions/workflows/validate.yml)
 [![GitHub release](https://img.shields.io/github/v/release/jlevere/obsidian-mcp-plugin)](https://github.com/jlevere/obsidian-mcp-plugin/releases)
 [![Downloads](https://img.shields.io/github/downloads/jlevere/obsidian-mcp-plugin/total)](https://github.com/jlevere/obsidian-mcp-plugin/releases)
 
@@ -372,11 +372,14 @@ A nix flake is provided to create a standardized development environment.
 git clone https://github.com/jlevere/obsidian-mcp-plugin.git
 cd obsidian-mcp-plugin
 
-echo "use flake" > .envrc && direnv allow
+nix develop
+
+# for cool people who use direnv
+# echo "use flake" > .envrc && direnv allow
 
 pnpm install
 
-pnpm dev
+pnpm build:dev
 ```
 
 ### Project Structure
@@ -388,7 +391,7 @@ pnpm dev
   - `vault/`: Vault interaction code
 - `tests/`: Test files
 
-### Building
+### Build Production
 
 ```bash
 pnpm run build
