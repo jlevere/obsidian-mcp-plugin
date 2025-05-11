@@ -111,8 +111,21 @@ export async function findAndParseSchemas(
         continue;
       }
 
-      // At this point TypeScript knows parsedYaml matches ValidatedSchema
       const validatedYaml = parsedYaml;
+      const meta = validatedYaml.metadata;
+      const fields = validatedYaml.fields;
+
+      let allPathComponentsPresent = true;
+      for (const component of meta.pathComponents) {
+        if (!(component in fields)) {
+          console.warn(
+            `Skipping file ${file.path}: metadata.pathComponents "${component}" is not present in fields.`
+          );
+          allPathComponentsPresent = false;
+          break;
+        }
+      }
+      if (!allPathComponentsPresent) continue;
 
       validSchemas.push(validatedYaml);
       console.log(

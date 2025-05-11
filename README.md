@@ -335,6 +335,20 @@ Use fields to define the structure using types like string, number, array, objec
 
 Once defined, your schema will automatically become a tool the LLM can use to update that file type.
 
+Place the schema that you write into a "schema" directory in your obsidian vault. The schema should be defined in a markdown file contained within a codeblock with the syntax setting like this:
+
+```md
+```yaml schema
+```
+
+There can be other text in the same markdown such as notes or descriptions, but Vault MCP will only use the yaml defined in the specified codeblock above.
+
+Place this directory path into the dynamic tools settings in Vault MCP settings and restart the plugin to parse and generate the dynamic tools. They will populate in the settings pannel like this:
+
+![dynamic settings](./docs/obsidian-settings-dynamic.png)
+
+The `list-schemas` tool is automatically created when the dynamic tools are to allow clients to view the schemas directly if necessary.
+
 Obsidian will render the YAML structure as a nicely formatted frontmatter or embedded block in your markdown.
 
 When writing schemas, I found this tool particularly helpful [stefanterdell.github.io/json-schema-to-zod-react](https://stefanterdell.github.io/json-schema-to-zod-react/). Vault MCP uses this internally to generate the `zod` but this is a more visual method to help in troubleshooting.
