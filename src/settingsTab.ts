@@ -94,10 +94,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     const createEndpointSetting = (name: string, url: string) => {
       new Setting(containerEl)
         .setName(name)
-        .addText(
-          (text) =>
-            (text.setValue(url).setDisabled(true).inputEl.style.width = "100%")
-        )
+        .addText((text) => text.setValue(url).setDisabled(true))
         .addButton((button) =>
           button
             .setIcon("copy")
