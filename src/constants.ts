@@ -2,7 +2,7 @@ import { ObsidianMcpSettings } from "@types";
 
 export const DEFAULT_SETTINGS: ObsidianMcpSettings = {
   port: 3000,
-  bindingHost: "0.0.0.0",
+  bindingHost: "127.0.0.1",
   disabledTools: [],
   enableDynamicTools: false,
   dynamicToolsPath: "metadata/schemas",
