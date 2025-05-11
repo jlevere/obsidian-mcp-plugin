@@ -218,7 +218,7 @@ export class ServerManager {
       req.body !== null &&
       (req.body as { method?: unknown }).method === "initialize"
     ) {
-      return this.createNewStreamableTransport();
+      return this.createNewStreamableTransport(req);
     }
 
     // Case 3: Invalid request
@@ -267,6 +267,7 @@ export class ServerManager {
     this.setupSseCleanup(res, transport, keepAliveTimer);
 
     await this.mcpServer?.connect(transport);
+    this.showClientConnectedNotice(req);
   }
 
   /**
@@ -386,7 +387,10 @@ export class ServerManager {
   /**
    * Helper method to create a new StreamableHTTP transport.
    */
-  private async createNewStreamableTransport(): Promise<StreamableHTTPServerTransport> {
+  private async createNewStreamableTransport(
+    req: express.Request
+  ): Promise<StreamableHTTPServerTransport> {
+    this.showClientConnectedNotice(req);
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: () => randomUUID(),
       onsessioninitialized: (sid) => {
@@ -528,6 +532,12 @@ export class ServerManager {
         });
       });
     }
+  }
+
+  private showClientConnectedNotice(req: express.Request) {
+    const ip = req.socket.remoteAddress;
+    const port = req.socket.remotePort;
+    new Notice(`Client connected to ${PLUGIN_NAME} server: ${ip}:${port}`);
   }
 }
 
