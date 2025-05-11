@@ -13,3 +13,5 @@ data.json
 .obsidian
 
 main.js
+
+obs-api.d.ts
