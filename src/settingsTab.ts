@@ -2,6 +2,7 @@ import { App, PluginSettingTab, Setting, Notice, debounce } from "obsidian";
 import ObsidianMcpPlugin from "./main";
 import { VAULT_TOOLS, TOOL_DESCRIPTIONS } from "./vault/index";
 import { VAULT_RESOURCES, RESOURCE_DESCRIPTIONS } from "./resources";
+import { SessionInfo } from "./types";
 
 export class ObsidianMcpSettingTab extends PluginSettingTab {
   plugin: ObsidianMcpPlugin;
@@ -30,6 +31,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     containerEl.empty();
 
     this.serverControls(containerEl);
+    this.displayActiveSessionsSection(containerEl);
     this.displayServerSettings(containerEl);
     this.displayToolsSection(containerEl);
     this.displayResourcesSection(containerEl);
@@ -42,10 +44,13 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       .setName("Restart Server")
       .setDesc("Restart the MCP server to apply changes")
       .addButton((button) =>
-        button.setButtonText("Restart Server").onClick(async () => {
-          await this.plugin.restartServer();
-          this.display();
-        })
+        button
+          .setButtonText("Restart Server")
+          .setCta()
+          .onClick(async () => {
+            await this.plugin.restartServer();
+            this.display();
+          })
       );
   }
 
@@ -294,5 +299,30 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
         lastSetting.title = fullDescription;
       }
     });
+  }
+
+  private displayActiveSessionsSection(containerEl: HTMLElement): void {
+    new Setting(containerEl).setName("Active Sessions").setHeading();
+    const serverManager = this.plugin.serverManager;
+    const sessions: SessionInfo[] = serverManager.getSessionInfo();
+
+    if (!sessions.length) {
+      new Setting(containerEl)
+        .setDesc("No active sessions.")
+        .setClass("setting-item-description");
+    } else {
+      sessions.forEach((session: SessionInfo) => {
+        new Setting(containerEl)
+          .setName(`${session.type} - ${session.sessionId}`)
+          .setDesc(session.connected ? "Connected" : "Disconnected")
+          .setClass("setting-item-description");
+      });
+    }
+
+    new Setting(containerEl).addButton((button) =>
+      button.setButtonText("Refresh Sessions").onClick(() => {
+        this.display();
+      })
+    );
   }
 }

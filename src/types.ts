@@ -88,3 +88,9 @@ export interface TreeBuildOptions {
   includeMetadata?: boolean;
   maxDepth?: number;
 }
+
+export interface SessionInfo {
+  sessionId: string;
+  type: string;
+  connected: boolean;
+}

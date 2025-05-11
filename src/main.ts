@@ -9,7 +9,7 @@ import { getErrorMessage } from "./utils/helpers";
 export default class ObsidianMcpPlugin extends Plugin {
   settings: ObsidianMcpSettings;
   toolManager: ToolManager;
-  private serverManager: ServerManager;
+  public serverManager: ServerManager;
   private isRestarting = false;
   private isInitialized = false;
 

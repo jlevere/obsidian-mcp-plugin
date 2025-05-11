@@ -539,6 +539,20 @@ export class ServerManager {
     const port = req.socket.remotePort;
     new Notice(`Client connected to ${PLUGIN_NAME} server: ${ip}:${port}`);
   }
+
+  /**
+   * Returns info about all current sessions.
+   */
+  public getSessionInfo() {
+    return Array.from(this.mcpTransports.entries()).map(
+      ([sessionId, transport]) => ({
+        sessionId,
+        type:
+          transport instanceof SSEServerTransport ? "SSE" : "StreamableHTTP",
+        connected: true,
+      })
+    );
+  }
 }
 
 export function bearerAuth(
