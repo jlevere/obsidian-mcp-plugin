@@ -41,7 +41,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
 
   private serverControls(containerEl: HTMLElement): void {
     new Setting(containerEl)
-      .setName("Restart Server")
+      .setName("Restart server")
       .setDesc("Restart the MCP server to apply changes")
       .addButton((button) =>
         button
@@ -55,10 +55,10 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
   }
 
   private displayServerSettings(containerEl: HTMLElement): void {
-    new Setting(containerEl).setName("HTTP Server").setHeading();
+    new Setting(containerEl).setName("HTTP server").setHeading();
 
     new Setting(containerEl)
-      .setName("Server Port")
+      .setName("Server port")
       .setDesc("Port for the MCP server")
       .addText((text) =>
         text
@@ -75,7 +75,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Binding Host")
+      .setName("Binding host")
       .setDesc(
         "Host to bind the server to (0.0.0.0 for all interfaces, 127.0.0.1 for localhost only)"
       )
@@ -89,7 +89,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
           })
       );
 
-    new Setting(containerEl).setName("Listening Endpoints").setHeading();
+    new Setting(containerEl).setName("Listening endpoints").setHeading();
 
     const createEndpointSetting = (name: string, url: string) => {
       new Setting(containerEl)
@@ -120,7 +120,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
 
     new Setting(containerEl).setName("Authentication").setHeading();
     new Setting(containerEl)
-      .setName("Enable Authentication")
+      .setName("Enable authentication")
       .setDesc("Require bearer token for all API requests.")
       .addToggle((toggle) =>
         toggle
@@ -141,7 +141,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       // Masked token display
       const masked = this.plugin.settings.authToken.replace(/.(?=.{4})/g, "*");
       new Setting(containerEl)
-        .setName("Auth Token")
+        .setName("Auth token")
         .setDesc(
           "Clients must send this token in the 'Authorization: Bearer <token>' HTTP header."
         )
@@ -149,7 +149,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
         .addButton((button) =>
           button
             .setIcon("copy")
-            .setTooltip("Copy Token")
+            .setTooltip("Copy token")
             .onClick(async () => {
               await navigator.clipboard.writeText(
                 this.plugin.settings.authToken
@@ -176,10 +176,10 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
   private async displayDynamicToolsSettings(
     containerEl: HTMLElement
   ): Promise<void> {
-    new Setting(containerEl).setName("Dynamic Tools").setHeading();
+    new Setting(containerEl).setName("Dynamic tools").setHeading();
 
     new Setting(containerEl)
-      .setName("Enable Dynamic Tools")
+      .setName("Enable dynamic tools")
       .setDesc("Enable dynamic tool generation from schema files")
       .addToggle((toggle) =>
         toggle
@@ -194,7 +194,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Schema Directory")
+      .setName("Schema directory")
       .setDesc("Directory path for schema files (relative to vault root)")
       .addText((text) =>
         text
@@ -208,7 +208,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     if (this.plugin.settings.enableDynamicTools) {
       const dynamicTools = await this.plugin.toolManager.getDynamicTools();
       if (dynamicTools.length > 0) {
-        new Setting(containerEl).setName("Loaded Dynamic Tools").setHeading();
+        new Setting(containerEl).setName("Loaded dynamic tools").setHeading();
         for (const toolName of dynamicTools) {
           this.createToggleSetting(
             containerEl,
@@ -248,7 +248,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
   }
 
   private displayToolsSection(containerEl: HTMLElement): void {
-    new Setting(containerEl).setName("Available Tools").setHeading();
+    new Setting(containerEl).setName("Available tools").setHeading();
 
     Object.keys(VAULT_TOOLS).forEach((toolName) => {
       const fullDescription =
@@ -269,7 +269,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
   }
 
   private displayResourcesSection(containerEl: HTMLElement): void {
-    new Setting(containerEl).setName("Available Resources").setHeading();
+    new Setting(containerEl).setName("Available resources").setHeading();
 
     Object.keys(VAULT_RESOURCES).forEach((resourceName) => {
       const fullDescription =
@@ -290,7 +290,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
   }
 
   private displayActiveSessionsSection(containerEl: HTMLElement): void {
-    new Setting(containerEl).setName("Active Sessions").setHeading();
+    new Setting(containerEl).setName("Active sessions").setHeading();
     const serverManager = this.plugin.serverManager;
     const sessions: SessionInfo[] = serverManager.getSessionInfo();
 
@@ -308,7 +308,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     }
 
     new Setting(containerEl).addButton((button) =>
-      button.setButtonText("Refresh Sessions").onClick(() => {
+      button.setButtonText("Refresh sessions").onClick(() => {
         this.display();
       })
     );
