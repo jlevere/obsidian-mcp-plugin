@@ -7,7 +7,6 @@ import {
 import { handleStructuredUpdate } from "../structured-tools/crud-handler";
 import { registerListSchemasHandler } from "../structured-tools/list-schemas";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types";
-import { PLUGIN_NAME } from "../constants";
 
 export interface StructuredManagerConfig {
   enabled: boolean;
