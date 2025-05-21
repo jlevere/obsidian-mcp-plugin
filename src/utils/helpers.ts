@@ -68,7 +68,7 @@ export async function buildVaultTree(
   file: TAbstractFile,
   options: TreeBuildOptions = {},
 ): Promise<TreeNode | null> {
-  const { includeMetadata = false, maxDepth = Infinity } = options;
+  const { includeMetadata = false, maxDepth = Infinity, maxResults = Infinity } = options;
   const currentDepth = maxDepth;
 
   if (file instanceof TFile) {
@@ -101,7 +101,8 @@ export async function buildVaultTree(
     };
 
     if (currentDepth > 0) {
-      node.children = await Promise.all(
+      // Get all children first
+      let allChildren = await Promise.all(
         file.children.map((child) =>
           buildVaultTree(app, child, {
             ...options,
@@ -109,10 +110,18 @@ export async function buildVaultTree(
           }),
         ),
       );
+
       // Filter out null values and assert type
-      node.children = node.children.filter(
+      allChildren = allChildren.filter(
         (child): child is TreeNode => child !== null,
       );
+
+      // Apply maxResults limit if specified
+      if (maxResults !== Infinity && allChildren.length > maxResults) {
+        allChildren = allChildren.slice(0, maxResults);
+      }
+
+      node.children = allChildren;
     }
 
     return node;

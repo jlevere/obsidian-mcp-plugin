@@ -40,7 +40,7 @@ way for applications to interact with your vault.
 
 Vault MCP started as a small component of a larger project that needed an alternative to traditional RAG methods. It needed something LLMs could use to reliably retrieve and update structured, human-readable data, without relying on unpredictable vector databases or embedding fuzziness.
 
-Existing Obsidian MCP servers weren’t a great fit. They were REST-heavy, complex, and not well-suited for language models to interact with naturally. So this plugin was spun off to solve that: a lightweight interface for working with Obsidian vaults in a way that’s natural for LLMs and transparent for humans.
+Existing Obsidian MCP servers weren't a great fit. They were REST-heavy, complex, and not well-suited for language models to interact with naturally. So this plugin was spun off to solve that: a lightweight interface for working with Obsidian vaults in a way that's natural for LLMs and transparent for humans.
 
 ## Installation
 
@@ -96,7 +96,7 @@ You can find the correct url from the plugin's setting panel under endpoints.
 - `obsidian-mcp-diff-edit-file`: Edit files using simplified udiff (see [below](#obsidian-mcp-diff-edit-file))
 - `obsidian-mcp-search-contents`: Fuzzy search across the contents of all files in your vault
 - `obsidian-mcp-search-filenames`: Fuzzy search across all file names in your vault
-- `obsidian-mcp-vault-tree`: Browse vault structure
+- `obsidian-mcp-list-files`: List files and directories in your vault with customizable depth and result limits
 - `obsidian-mcp-upsert-file`: Create or update files
 - `obsidian-mcp-rollback-edit`: Roll back the last edit to a markdown file (reverts the last change made by supported tools)
 

@@ -14,9 +14,9 @@ import {
   description as searchFilenamesDescription,
 } from "./search-filenames";
 import {
-  registerVaultTreeHandler,
-  description as treeDescription,
-} from "./tree";
+  registerListFilesHandler,
+  description as listFilesDescription,
+} from "./list-files";
 import {
   registerUpsertFileHandler,
   description as upsertDescription,
@@ -32,7 +32,7 @@ export const VAULT_TOOLS: ToolRegistry = {
   "obsidian-mcp-diff-edit-file": registerDiffEditHandler,
   "obsidian-mcp-search-contents": registerSearchContentsHandler,
   "obsidian-mcp-search-filenames": registerSearchFilenamesHandler,
-  "obsidian-mcp-tree": registerVaultTreeHandler,
+  "obsidian-mcp-list-files": registerListFilesHandler,
   "obsidian-mcp-upsert-file": registerUpsertFileHandler,
   "obsidian-mcp-rollback-edit": registerRollbackEditHandler,
 };
@@ -43,7 +43,7 @@ export const TOOL_DESCRIPTIONS: Record<string, string> = {
   "obsidian-mcp-diff-edit-file": diffEditDescription,
   "obsidian-mcp-search-contents": searchContentsDescription,
   "obsidian-mcp-search-filenames": searchFilenamesDescription,
-  "obsidian-mcp-tree": treeDescription,
+  "obsidian-mcp-list-files": listFilesDescription,
   "obsidian-mcp-upsert-file": upsertDescription,
   "obsidian-mcp-rollback-edit": rollbackEditDescription,
 } as const;
@@ -53,7 +53,7 @@ export function registerVaultTools(app: App, mcpServer: McpServer) {
   registerDiffEditHandler(app, mcpServer);
   registerSearchContentsHandler(app, mcpServer);
   registerSearchFilenamesHandler(app, mcpServer);
-  registerVaultTreeHandler(app, mcpServer);
+  registerListFilesHandler(app, mcpServer);
   registerUpsertFileHandler(app, mcpServer);
   registerRollbackEditHandler(app, mcpServer);
 }

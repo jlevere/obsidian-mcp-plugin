@@ -4,22 +4,23 @@ import { z } from "zod";
 import { buildVaultTree } from "../utils/helpers";
 
 export const description = `
-Returns a hierarchical tree representation of a directory in the Obsidian vault.
-If a directory path is provided via "dir", the tree is built for that directory.
+Lists files and directories in the Obsidian vault as a hierarchical structure.
+If a directory path is provided via "dir", the listing is built for that directory.
 If no path is provided, the vault root is used.
 A "depth" parameter is available to limit how many subfolder levels to include.
+A "limit" parameter is available to cap the number of results returned.
 `;
 
-export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
+export function registerListFilesHandler(app: App, mcpServer: McpServer) {
   mcpServer.tool(
-    "obsidian-mcp-tree",
+    "obsidian-mcp-list-files",
     description,
     {
       dir: z
         .string()
         .optional()
         .describe(
-          "Path to the directory in the vault to tree; if omitted, the vault root is used.",
+          "Path to the directory in the vault to list; if omitted, the vault root is used.",
         ),
       depth: z
         .number()
@@ -30,8 +31,17 @@ export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
         .describe(
           "Recursion level for subfolders. Use 0 to return only the current folder, 1 to include immediate children, etc. Defaults to full recursion.",
         ),
+      limit: z
+        .number()
+        .int()
+        .min(1)
+        .optional()
+        .transform((val) => val ?? 20)
+        .describe(
+          "Maximum number of files to return. Defaults to 20.",
+        ),
     },
-    async ({ dir, depth }) => {
+    async ({ dir, depth, limit }) => {
       try {
         const target = dir
           ? app.vault.getAbstractFileByPath(normalizePath(dir))
@@ -51,14 +61,14 @@ export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
           };
         }
 
-        const tree = await buildVaultTree(app, target, { maxDepth: depth });
+        const tree = await buildVaultTree(app, target, { maxDepth: depth, maxResults: limit });
 
         if (!tree) {
           return {
             content: [
               {
                 type: "text",
-                text: `Failed to build tree for: ${normalizePath(dir || "/")}`,
+                text: `Failed to build file listing for: ${normalizePath(dir || "/")}`,
               },
             ],
             isError: true,
@@ -78,9 +88,8 @@ export function registerVaultTreeHandler(app: App, mcpServer: McpServer) {
           content: [
             {
               type: "text",
-              text: `Error building directory tree: ${
-                error instanceof Error ? error.message : String(error)
-              }`,
+              text: `Error listing files: ${error instanceof Error ? error.message : String(error)
+                }`,
             },
           ],
           isError: true,

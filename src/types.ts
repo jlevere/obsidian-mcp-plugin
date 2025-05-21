@@ -87,6 +87,7 @@ export type TreeNode = FileTreeNode | FolderTreeNode;
 export interface TreeBuildOptions {
   includeMetadata?: boolean;
   maxDepth?: number;
+  maxResults?: number;
 }
 
 export interface SessionInfo {
