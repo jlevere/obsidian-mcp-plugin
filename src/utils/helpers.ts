@@ -68,7 +68,11 @@ export async function buildVaultTree(
   file: TAbstractFile,
   options: TreeBuildOptions = {},
 ): Promise<TreeNode | null> {
-  const { includeMetadata = false, maxDepth = Infinity, maxResults = Infinity } = options;
+  const {
+    includeMetadata = false,
+    maxDepth = Infinity,
+    maxResults = Infinity,
+  } = options;
   const currentDepth = maxDepth;
 
   if (file instanceof TFile) {

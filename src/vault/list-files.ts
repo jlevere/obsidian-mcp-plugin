@@ -37,9 +37,7 @@ export function registerListFilesHandler(app: App, mcpServer: McpServer) {
         .min(1)
         .optional()
         .transform((val) => val ?? 20)
-        .describe(
-          "Maximum number of files to return. Defaults to 20.",
-        ),
+        .describe("Maximum number of files to return. Defaults to 20."),
     },
     async ({ dir, depth, limit }) => {
       try {
@@ -61,7 +59,10 @@ export function registerListFilesHandler(app: App, mcpServer: McpServer) {
           };
         }
 
-        const tree = await buildVaultTree(app, target, { maxDepth: depth, maxResults: limit });
+        const tree = await buildVaultTree(app, target, {
+          maxDepth: depth,
+          maxResults: limit,
+        });
 
         if (!tree) {
           return {
@@ -88,8 +89,9 @@ export function registerListFilesHandler(app: App, mcpServer: McpServer) {
           content: [
             {
               type: "text",
-              text: `Error listing files: ${error instanceof Error ? error.message : String(error)
-                }`,
+              text: `Error listing files: ${
+                error instanceof Error ? error.message : String(error)
+              }`,
             },
           ],
           isError: true,
