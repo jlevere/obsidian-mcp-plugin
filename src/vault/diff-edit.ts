@@ -19,7 +19,7 @@ import { createPatch } from "diff";
 function applyDiff(
   path: string,
   udiff: string,
-  originalContent: string,
+  originalContent: string
 ): { updated: string; diff: string } {
   // 1) Strip diff fences (```diff ... ```) and normalize newlines.  We dont intend to use fences,
   // but we will accept them if provided.
@@ -38,12 +38,12 @@ function applyDiff(
   const newFilePath = stripPrefix(newFile);
   if (oldFilePath !== newFilePath) {
     throw new Error(
-      `Diff targets two different files ('${oldFile}' vs '${newFile}').`,
+      `Diff targets two different files ('${oldFile}' vs '${newFile}').`
     );
   }
   if (stripPrefix(path) !== oldFilePath) {
     throw new Error(
-      `Diff file path (${oldFilePath}) does not match provided path (${path}).`,
+      `Diff file path (${oldFilePath}) does not match provided path (${path}).`
     );
   }
   // Ensure only one file is present in diff (no additional '---' lines beyond the first pair)
@@ -52,7 +52,7 @@ function applyDiff(
     .findIndex((line) => line.startsWith("---"));
   if (otherFileIndex !== -1) {
     throw new Error(
-      "Diff targets multiple files; only single-file diffs are supported.",
+      "Diff targets multiple files; only single-file diffs are supported."
     );
   }
 
@@ -176,7 +176,7 @@ export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
       await saveRollback(app, normPath, "obsidian-mcp-diff-edit-file");
       try {
         const { updated, diff } = applyDiff(normPath, udiff, fileContent);
-        await app.vault.adapter.write(normPath, updated);
+        await app.vault.modify(file, updated);
         return {
           content: [{ type: "text", text: diff }],
           isError: false,
@@ -192,6 +192,6 @@ export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
           isError: true,
         };
       }
-    },
+    }
   );
 }
