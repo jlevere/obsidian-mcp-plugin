@@ -1,5 +1,4 @@
-import { App, TFile, normalizePath } from "obsidian";
-import yaml from "js-yaml";
+import { App, TFile, normalizePath, parseYaml } from "obsidian";
 import { StructuredManagerConfig } from "../managers/StructuredManager";
 import Ajv from "ajv";
 import metaSchema from "./meta-schema.json";
@@ -70,7 +69,7 @@ export async function findAndParseSchemas(
       const yamlContent = match[1];
       let parsedYaml: unknown;
       try {
-        parsedYaml = yaml.load(yamlContent);
+        parsedYaml = parseYaml(yamlContent);
       } catch (yamlError) {
         console.warn(
           `Skipping file ${file.path}: Failed to parse YAML content. Error: ${

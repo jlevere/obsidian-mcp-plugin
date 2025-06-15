@@ -30,6 +30,7 @@
   "devDependencies": {
     "@esbuild-plugins/tsconfig-paths": "^0.1.2",
     "@eslint/js": "^9.26.0",
+    "@jest/globals": "^29.7.0",
     "@modelcontextprotocol/inspector": "^0.11.0",
     "@modelcontextprotocol/sdk": "^1.10.2",
     "@types/diff": "^7.0.2",
@@ -60,7 +61,6 @@
     "ajv": "^8.17.1",
     "diff": "^7.0.0",
     "express": "^5.1.0",
-    "js-yaml": "^4.1.0",
     "zod": "^3.24.2"
   }
 }
