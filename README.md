@@ -6,7 +6,7 @@
 [![GitHub release](https://img.shields.io/github/v/release/jlevere/obsidian-mcp-plugin)](https://github.com/jlevere/obsidian-mcp-plugin/releases)
 [![Downloads](https://img.shields.io/github/downloads/jlevere/obsidian-mcp-plugin/total)](https://github.com/jlevere/obsidian-mcp-plugin/releases)
 
-This Obsidian plugin embeds an MCP server directly within Obsidian, providing a streamlined
+This Obsidian plugin embeds an MCP ([Model Context Protocol](https://modelcontextprotocol.io/introduction)) server directly within Obsidian, providing a streamlined
 way for applications to interact with your vault.
 
 [Installation](#installation) •
