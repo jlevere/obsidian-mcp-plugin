@@ -20,9 +20,6 @@ importers:
       express:
         specifier: ^5.1.0
         version: 5.1.0
-      js-yaml:
-        specifier: ^4.1.0
-        version: 4.1.0
       zod:
         specifier: ^3.24.2
         version: 3.24.2
@@ -33,6 +30,9 @@ importers:
       '@eslint/js':
         specifier: ^9.26.0
         version: 9.26.0
+      '@jest/globals':
+        specifier: ^29.7.0
+        version: 29.7.0
       '@modelcontextprotocol/inspector':
         specifier: ^0.11.0
         version: 0.11.0(@types/node@22.14.1)(tailwindcss@4.1.4)(typescript@5.8.3)

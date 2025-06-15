@@ -1,7 +1,6 @@
-import { App, TFile, normalizePath } from "obsidian";
+import { App, TFile, normalizePath, stringifyYaml } from "obsidian";
 import { ValidatedSchema } from "./schema";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types";
-import yaml from "js-yaml";
 import { saveRollback } from "../utils/helpers";
 
 /**
@@ -75,11 +74,16 @@ export async function handleStructuredUpdate(
     if (!file) {
       // Create new file with directory structure
       const dir = targetPath.substring(0, targetPath.lastIndexOf("/"));
+
       if (dir) {
-        await app.vault.createFolder(dir).catch(() => {}); // Ignore if exists
+        try {
+          await app.vault.createFolder(dir);
+        } catch {
+          // Ignore if exists
+        }
       }
 
-      const yamlContent = "---\n" + yaml.dump(dataToSave) + "---\n";
+      const yamlContent = "---\n" + stringifyYaml(dataToSave) + "---\n";
       await app.vault.create(targetPath, yamlContent);
       return {
         content: [
@@ -124,7 +128,7 @@ export async function handleStructuredUpdate(
     }
 
     // Generate new content with updated frontmatter
-    const yamlContent = "---\n" + yaml.dump(dataToSave) + "---\n";
+    const yamlContent = "---\n" + stringifyYaml(dataToSave) + "---\n";
     const newContent = yamlContent + (body || "\n");
     await app.vault.modify(file, newContent);
 
