@@ -15,8 +15,7 @@ export async function handleStructuredUpdate(
   try {
     // 1. Validate required path components and identifier field
     const missingPathComponents = schema.metadata.pathComponents.filter(
-      (component) =>
-        !(component in inputArgs) || typeof inputArgs[component] !== "string",
+      component => !(component in inputArgs) || typeof inputArgs[component] !== "string",
     );
 
     if (missingPathComponents.length > 0) {
@@ -24,9 +23,7 @@ export async function handleStructuredUpdate(
         content: [
           {
             type: "text",
-            text: `Missing or invalid path components: ${missingPathComponents.join(
-              ", ",
-            )}`,
+            text: `Missing or invalid path components: ${missingPathComponents.join(", ")}`,
           },
         ],
         isError: true,
@@ -52,10 +49,7 @@ export async function handleStructuredUpdate(
 
     // Replace path components
     for (const component of schema.metadata.pathComponents) {
-      targetPath = targetPath.replace(
-        `\${${component}}`,
-        inputArgs[component] as string,
-      );
+      targetPath = targetPath.replace(`\${${component}}`, inputArgs[component] as string);
     }
 
     // Replace identifier field if it's different from path components
@@ -147,9 +141,7 @@ export async function handleStructuredUpdate(
       content: [
         {
           type: "text",
-          text: `Operation failed: ${
-            error instanceof Error ? error.message : String(error)
-          }`,
+          text: `Operation failed: ${error instanceof Error ? error.message : String(error)}`,
         },
       ],
       isError: true,

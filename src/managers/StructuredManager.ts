@@ -1,9 +1,6 @@
 import { App } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import {
-  findAndParseSchemas,
-  generateZodSchema,
-} from "../structured-tools/schema";
+import { findAndParseSchemas, generateZodSchema } from "../structured-tools/schema";
 import { handleStructuredUpdate } from "../structured-tools/crud-handler";
 import { registerListSchemasHandler } from "../structured-tools/list-schemas";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types";
@@ -55,9 +52,7 @@ export class StructuredManager {
           const zodSchema = generateZodSchema(schema);
           mcpServer.tool(
             toolName,
-            `Update ${
-              schema.metadata.schemaName
-            } content using the following template: ${
+            `Update ${schema.metadata.schemaName} content using the following template: ${
               schema.metadata.pathTemplate
             }
 Required fields: ${schema.metadata.pathComponents.join(", ")}
@@ -68,10 +63,7 @@ ${schema.metadata.description}`,
             },
           );
         } catch (error) {
-          console.error(
-            `Error registering structured tool ${toolName}:`,
-            error,
-          );
+          console.error(`Error registering structured tool ${toolName}:`, error);
         }
       }
     } catch (error) {

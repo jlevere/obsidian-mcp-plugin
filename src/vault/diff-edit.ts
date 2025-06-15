@@ -1,11 +1,7 @@
 import { App } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import {
-  getErrorMessage,
-  resolveTFileOrError,
-  saveRollback,
-} from "../utils/helpers";
+import { getErrorMessage, resolveTFileOrError, saveRollback } from "../utils/helpers";
 import { createPatch } from "diff";
 
 /**
@@ -19,7 +15,7 @@ import { createPatch } from "diff";
 function applyDiff(
   path: string,
   udiff: string,
-  originalContent: string
+  originalContent: string,
 ): { updated: string; diff: string } {
   // 1) Strip diff fences (```diff ... ```) and normalize newlines.  We dont intend to use fences,
   // but we will accept them if provided.
@@ -37,23 +33,15 @@ function applyDiff(
   const oldFilePath = stripPrefix(oldFile);
   const newFilePath = stripPrefix(newFile);
   if (oldFilePath !== newFilePath) {
-    throw new Error(
-      `Diff targets two different files ('${oldFile}' vs '${newFile}').`
-    );
+    throw new Error(`Diff targets two different files ('${oldFile}' vs '${newFile}').`);
   }
   if (stripPrefix(path) !== oldFilePath) {
-    throw new Error(
-      `Diff file path (${oldFilePath}) does not match provided path (${path}).`
-    );
+    throw new Error(`Diff file path (${oldFilePath}) does not match provided path (${path}).`);
   }
   // Ensure only one file is present in diff (no additional '---' lines beyond the first pair)
-  const otherFileIndex = diffLines
-    .slice(2)
-    .findIndex((line) => line.startsWith("---"));
+  const otherFileIndex = diffLines.slice(2).findIndex(line => line.startsWith("---"));
   if (otherFileIndex !== -1) {
-    throw new Error(
-      "Diff targets multiple files; only single-file diffs are supported."
-    );
+    throw new Error("Diff targets multiple files; only single-file diffs are supported.");
   }
 
   // 3) Apply each hunk by walking lines in order
@@ -100,8 +88,7 @@ function applyDiff(
     // preserve trailing newline if needed
     if (
       hunkLines.length > 0 &&
-      (hunkLines[hunkLines.length - 1] === "" ||
-        hunkLines[hunkLines.length - 1] === " ")
+      (hunkLines[hunkLines.length - 1] === "" || hunkLines[hunkLines.length - 1] === " ")
     ) {
       searchBlock += "\n";
       replaceBlock += "\n";
@@ -110,10 +97,7 @@ function applyDiff(
     if (idx < 0) {
       throw new Error(`Hunk failed to apply; could not find:\n${searchBlock}`);
     }
-    updated =
-      updated.slice(0, idx) +
-      replaceBlock +
-      updated.slice(idx + searchBlock.length);
+    updated = updated.slice(0, idx) + replaceBlock + updated.slice(idx + searchBlock.length);
   }
 
   // 4) Emit final diff
@@ -192,6 +176,6 @@ export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
           isError: true,
         };
       }
-    }
+    },
   );
 }

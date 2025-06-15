@@ -50,10 +50,8 @@ export function registerUpsertFileHandler(app: App, mcpServer: McpServer) {
 
           await saveRollback(app, normPath, "upsert-file");
 
-          await app.vault.process(file, (currentData) => {
-            const base = currentData.endsWith("\n")
-              ? currentData
-              : currentData + "\n";
+          await app.vault.process(file, currentData => {
+            const base = currentData.endsWith("\n") ? currentData : currentData + "\n";
             return base + content;
           });
 
@@ -83,6 +81,6 @@ export function registerUpsertFileHandler(app: App, mcpServer: McpServer) {
           isError: true,
         };
       }
-    }
+    },
   );
 }

@@ -20,11 +20,7 @@ export function registerSearchFilenamesHandler(app: App, mcpServer: McpServer) {
     description,
     {
       query: z.string().describe("Search query for vault filenames"),
-      limit: z
-        .number()
-        .optional()
-        .default(5)
-        .describe("Maximum number of results to return"),
+      limit: z.number().optional().default(5).describe("Maximum number of results to return"),
     },
     ({ query, limit }) => {
       try {
@@ -51,12 +47,7 @@ export function registerSearchFilenamesHandler(app: App, mcpServer: McpServer) {
             {
               type: "text",
               text: limitedResults
-                .map(
-                  (item) =>
-                    `Match\n\tfilename='${item.filename}', \n\tScore=${
-                      item.score ?? 0
-                    }`,
-                )
+                .map(item => `Match\n\tfilename='${item.filename}', \n\tScore=${item.score ?? 0}`)
                 .join("\n"),
             },
           ],

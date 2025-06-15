@@ -39,10 +39,7 @@ export class ToolManager {
   }
 
   public getAvailableTools(): string[] {
-    const tools = [
-      ...Object.keys(VAULT_TOOLS),
-      ...Object.keys(VAULT_RESOURCES),
-    ];
+    const tools = [...Object.keys(VAULT_TOOLS), ...Object.keys(VAULT_RESOURCES)];
     return tools;
   }
 
@@ -82,7 +79,7 @@ export class ToolManager {
     // Register dynamic tools using StructuredManager if enabled
     if (this.settings.enableDynamicTools) {
       // Wait for a short delay to ensure vault is ready
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       try {
         await this.structuredManager.registerTools(mcpServer);

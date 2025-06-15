@@ -1,8 +1,5 @@
 import { App } from "obsidian";
-import {
-  McpServer,
-  ResourceMetadata,
-} from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer, ResourceMetadata } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { buildVaultTree, getErrorMessage } from "../utils/helpers";
 
 const resourceUri = "vault://map";
@@ -17,7 +14,7 @@ export const metadata: ResourceMetadata = {
 };
 
 export function registerVaultMapResource(app: App, mcpServer: McpServer) {
-  mcpServer.resource(resourceName, resourceUri, metadata, async (uri) => {
+  mcpServer.resource(resourceName, resourceUri, metadata, async uri => {
     try {
       const root = app.vault.getRoot();
       const tree = await buildVaultTree(app, root, { includeMetadata: true });

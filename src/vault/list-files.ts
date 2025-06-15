@@ -27,7 +27,7 @@ export function registerListFilesHandler(app: App, mcpServer: McpServer) {
         .int()
         .min(0)
         .optional()
-        .transform((val) => val ?? Infinity)
+        .transform(val => val ?? Infinity)
         .describe(
           "Recursion level for subfolders. Use 0 to return only the current folder, 1 to include immediate children, etc. Defaults to full recursion.",
         ),
@@ -50,9 +50,7 @@ export function registerListFilesHandler(app: App, mcpServer: McpServer) {
             content: [
               {
                 type: "text",
-                text: `Directory not found or is not a folder: ${normalizePath(
-                  dir || "/",
-                )}`,
+                text: `Directory not found or is not a folder: ${normalizePath(dir || "/")}`,
               },
             ],
             isError: true,

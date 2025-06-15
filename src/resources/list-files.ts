@@ -1,8 +1,5 @@
 import { App, TFile } from "obsidian";
-import {
-  McpServer,
-  ResourceTemplate,
-} from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 export function registerFileResources(app: App, mcpServer: McpServer) {
   // Resource 1: List all files in the vault
@@ -58,9 +55,7 @@ export function registerFileResources(app: App, mcpServer: McpServer) {
           };
         }
 
-        const file = app.vault
-          .getFiles()
-          .find((f: TFile) => f.path === filePath);
+        const file = app.vault.getFiles().find((f: TFile) => f.path === filePath);
         if (!file) {
           return {
             contents: [

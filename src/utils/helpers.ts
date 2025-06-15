@@ -14,12 +14,9 @@ import {
   TreeBuildOptions,
 } from "@types";
 
-export function getFileMetadataObject(
-  app: App,
-  file: TFile,
-): FileMetadataObject {
+export function getFileMetadataObject(app: App, file: TFile): FileMetadataObject {
   const cache = app.metadataCache.getFileCache(file);
-  const tags = cache?.tags?.map((tag) => tag.tag) || [];
+  const tags = cache?.tags?.map(tag => tag.tag) || [];
   const frontmatter = cache?.frontmatter || {};
 
   return {
@@ -68,11 +65,7 @@ export async function buildVaultTree(
   file: TAbstractFile,
   options: TreeBuildOptions = {},
 ): Promise<TreeNode | null> {
-  const {
-    includeMetadata = false,
-    maxDepth = Infinity,
-    maxResults = Infinity,
-  } = options;
+  const { includeMetadata = false, maxDepth = Infinity, maxResults = Infinity } = options;
   const currentDepth = maxDepth;
 
   if (file instanceof TFile) {
@@ -105,9 +98,8 @@ export async function buildVaultTree(
     };
 
     if (currentDepth > 0) {
-      // Get all children first
-      let allChildren = await Promise.all(
-        file.children.map((child) =>
+      node.children = await Promise.all(
+        file.children.map(child =>
           buildVaultTree(app, child, {
             ...options,
             maxDepth: currentDepth - 1,
@@ -116,16 +108,7 @@ export async function buildVaultTree(
       );
 
       // Filter out null values and assert type
-      allChildren = allChildren.filter(
-        (child): child is TreeNode => child !== null,
-      );
-
-      // Apply maxResults limit if specified
-      if (maxResults !== Infinity && allChildren.length > maxResults) {
-        allChildren = allChildren.slice(0, maxResults);
-      }
-
-      node.children = allChildren;
+      node.children = node.children.filter((child): child is TreeNode => child !== null);
     }
 
     return node;
@@ -192,9 +175,7 @@ export async function restoreRollback(
 export function getSimilarFilesSuggestion(app: App, normPath: string): string {
   const similarFiles = findSimilarFiles(app, normPath);
   if (similarFiles.length > 0) {
-    return `\n\nDid you mean:\n${similarFiles
-      .map((f) => `- ${f.path}`)
-      .join("\n")}`;
+    return `\n\nDid you mean:\n${similarFiles.map(f => `- ${f.path}`).join("\n")}`;
   }
   return "";
 }
@@ -222,9 +203,7 @@ export function resolveTFileOrError(app: App, path: string) {
   if (!(file instanceof TFile)) {
     return {
       error: {
-        content: [
-          { type: "text", text: `Path indicated is not a file: ${normPath}` },
-        ],
+        content: [{ type: "text", text: `Path indicated is not a file: ${normPath}` }],
         isError: true,
       },
     };

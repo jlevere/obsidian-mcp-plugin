@@ -1,8 +1,5 @@
 import { App } from "obsidian";
-import {
-  McpServer,
-  ResourceMetadata,
-} from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer, ResourceMetadata } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { getFileMetadataObject } from "../utils/helpers";
 
 const resourceUri = "metadata://active-file";
@@ -13,7 +10,7 @@ export const metadata: ResourceMetadata = {
 };
 
 export const registerActiveFileResource = (app: App, mcpServer: McpServer) =>
-  mcpServer.resource(resourceName, resourceUri, metadata, (uri) => {
+  mcpServer.resource(resourceName, resourceUri, metadata, uri => {
     try {
       const file = app.workspace.getActiveFile();
       if (!file) {

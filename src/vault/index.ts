@@ -1,10 +1,7 @@
 import { App } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { registerReadHandler, description as readDescription } from "./read";
-import {
-  registerDiffEditHandler,
-  description as diffEditDescription,
-} from "./diff-edit";
+import { registerDiffEditHandler, description as diffEditDescription } from "./diff-edit";
 import {
   registerSearchContentsHandler,
   description as searchContentsDescription,
@@ -13,14 +10,8 @@ import {
   registerSearchFilenamesHandler,
   description as searchFilenamesDescription,
 } from "./search-filenames";
-import {
-  registerListFilesHandler,
-  description as listFilesDescription,
-} from "./list-files";
-import {
-  registerUpsertFileHandler,
-  description as upsertDescription,
-} from "./upsert";
+import { registerListFilesHandler, description as listFilesDescription } from "./list-files";
+import { registerUpsertFileHandler, description as upsertDescription } from "./upsert";
 import {
   registerRollbackEditHandler,
   description as rollbackEditDescription,
