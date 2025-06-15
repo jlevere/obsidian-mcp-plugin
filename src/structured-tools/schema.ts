@@ -63,9 +63,7 @@ export async function findAndParseSchemas(
       const match = content.match(yamlRegex);
 
       if (!match || !match[1]) {
-        console.warn(
-          `Skipping file ${file.path}: No 'yaml schema' code block found.`,
-        );
+        console.warn(`Skipping file ${file.path}: No 'yaml schema' code block found.`);
         continue;
       }
 
@@ -82,23 +80,14 @@ export async function findAndParseSchemas(
         continue;
       }
 
-      if (
-        typeof parsedYaml !== "object" ||
-        !parsedYaml ||
-        !("fields" in parsedYaml)
-      ) {
-        console.warn(
-          `Skipping file ${file.path}: Parsed YAML must have a fields section`,
-        );
+      if (typeof parsedYaml !== "object" || !parsedYaml || !("fields" in parsedYaml)) {
+        console.warn(`Skipping file ${file.path}: Parsed YAML must have a fields section`);
         continue;
       }
 
       // Validate that the fields section is a valid JSON Schema
       if (!ajv.validateSchema(parsedYaml)) {
-        console.warn(
-          `Skipping file ${file.path}: Invalid JSON Schema:`,
-          ajv.errors,
-        );
+        console.warn(`Skipping file ${file.path}: Invalid JSON Schema:`, ajv.errors);
         continue;
       }
 
@@ -129,10 +118,7 @@ export async function findAndParseSchemas(
 
       validSchemas.push(validatedYaml);
     } catch (error) {
-      console.error(
-        `Unexpected error processing schema file ${file.path}:`,
-        error,
-      );
+      console.error(`Unexpected error processing schema file ${file.path}:`, error);
     }
   }
 
@@ -142,9 +128,7 @@ export async function findAndParseSchemas(
 /**
  * Generates a Zod schema from a schema definition
  */
-export function generateZodSchema(
-  schema: ValidatedSchema,
-): z.ZodObject<z.ZodRawShape> {
+export function generateZodSchema(schema: ValidatedSchema): z.ZodObject<z.ZodRawShape> {
   if (!schema.fields || typeof schema.fields !== "object") {
     throw new Error("Schema fields must be a valid object");
   }
@@ -173,9 +157,7 @@ export function generateZodSchema(
   } catch (error) {
     console.error("Schema generation error:", error);
     throw new Error(
-      `Failed to generate Zod schema: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
+      `Failed to generate Zod schema: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
 }

@@ -17,9 +17,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
         this.plugin.settings.dynamicToolsPath = value;
         await this.plugin.saveSettings();
         this.plugin.toolManager.updateSettings(this.plugin.settings);
-        new Notice(
-          "Schema path changed. Please restart the server to apply changes.",
-        );
+        new Notice("Schema path changed. Please restart the server to apply changes.");
       },
       2000,
       true,
@@ -43,7 +41,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Restart server")
       .setDesc("Restart the MCP server to apply changes")
-      .addButton((button) =>
+      .addButton(button =>
         button
           .setButtonText("Restart Server")
           .setCta()
@@ -60,11 +58,11 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Server port")
       .setDesc("Port for the MCP server")
-      .addText((text) =>
+      .addText(text =>
         text
           .setPlaceholder("3000")
           .setValue(this.plugin.settings.port.toString())
-          .onChange(async (value) => {
+          .onChange(async value => {
             if (value && !isNaN(Number(value))) {
               this.plugin.settings.port = Number(value);
               await this.plugin.saveSettings();
@@ -79,11 +77,11 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       .setDesc(
         "Host to bind the server to (0.0.0.0 for all interfaces, 127.0.0.1 for localhost only)",
       )
-      .addText((text) =>
+      .addText(text =>
         text
           .setPlaceholder("0.0.0.0")
           .setValue(this.plugin.settings.bindingHost)
-          .onChange(async (value) => {
+          .onChange(async value => {
             this.plugin.settings.bindingHost = value;
             await this.plugin.saveSettings();
           }),
@@ -94,8 +92,8 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     const createEndpointSetting = (name: string, url: string) => {
       new Setting(containerEl)
         .setName(name)
-        .addText((text) => text.setValue(url).setDisabled(true))
-        .addButton((button) =>
+        .addText(text => text.setValue(url).setDisabled(true))
+        .addButton(button =>
           button
             .setIcon("copy")
             .setTooltip("Copy URL")
@@ -108,12 +106,8 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
 
     const host = this.plugin.settings.bindingHost || "0.0.0.0";
     const port = this.plugin.settings.port || 3000;
-    const mcpUrl = `http://${
-      host === "0.0.0.0" ? "localhost" : host
-    }:${port}/mcp`;
-    const sseUrl = `http://${
-      host === "0.0.0.0" ? "localhost" : host
-    }:${port}/sse`;
+    const mcpUrl = `http://${host === "0.0.0.0" ? "localhost" : host}:${port}/mcp`;
+    const sseUrl = `http://${host === "0.0.0.0" ? "localhost" : host}:${port}/sse`;
 
     createEndpointSetting("Streamable HTTP", mcpUrl);
     createEndpointSetting("SSE", sseUrl);
@@ -122,19 +116,17 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Enable authentication")
       .setDesc("Require bearer token for all API requests.")
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.enableAuth)
-          .onChange(async (value) => {
-            this.plugin.settings.enableAuth = value;
-            await this.plugin.saveSettings();
-            new Notice(
-              `Authentication ${
-                value ? "enabled" : "disabled"
-              }. Please restart the server to apply changes.`,
-            );
-            this.display();
-          }),
+      .addToggle(toggle =>
+        toggle.setValue(this.plugin.settings.enableAuth).onChange(async value => {
+          this.plugin.settings.enableAuth = value;
+          await this.plugin.saveSettings();
+          new Notice(
+            `Authentication ${
+              value ? "enabled" : "disabled"
+            }. Please restart the server to apply changes.`,
+          );
+          this.display();
+        }),
       );
 
     if (this.plugin.settings.enableAuth) {
@@ -142,61 +134,49 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       const masked = this.plugin.settings.authToken.replace(/.(?=.{4})/g, "*");
       new Setting(containerEl)
         .setName("Auth token")
-        .setDesc(
-          "Clients must send this token in the 'Authorization: Bearer <token>' HTTP header.",
-        )
-        .addText((text) => text.setValue(masked).setDisabled(true))
-        .addButton((button) =>
+        .setDesc("Clients must send this token in the 'Authorization: Bearer <token>' HTTP header.")
+        .addText(text => text.setValue(masked).setDisabled(true))
+        .addButton(button =>
           button
             .setIcon("copy")
             .setTooltip("Copy token")
             .onClick(async () => {
-              await navigator.clipboard.writeText(
-                this.plugin.settings.authToken,
-              );
+              await navigator.clipboard.writeText(this.plugin.settings.authToken);
               new Notice("Auth token copied to clipboard!");
             }),
         )
-        .addButton((button) =>
+        .addButton(button =>
           button
             .setButtonText("Regenerate")
             .setTooltip("Generate a new token (clients will need to update)")
             .onClick(async () => {
               this.plugin.settings.authToken = crypto.randomUUID();
               await this.plugin.saveSettings();
-              new Notice(
-                "New auth token generated. Please restart the server.",
-              );
+              new Notice("New auth token generated. Please restart the server.");
               this.display();
             }),
         );
     }
   }
 
-  private async displayDynamicToolsSettings(
-    containerEl: HTMLElement,
-  ): Promise<void> {
+  private async displayDynamicToolsSettings(containerEl: HTMLElement): Promise<void> {
     new Setting(containerEl).setName("Dynamic tools").setHeading();
 
     new Setting(containerEl)
       .setName("Enable dynamic tools")
       .setDesc("Enable dynamic tool generation from schema files")
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.enableDynamicTools)
-          .onChange(async (value) => {
-            this.plugin.settings.enableDynamicTools = value;
-            await this.plugin.saveSettings();
-            new Notice(
-              "Dynamic tools setting changed. Please restart the server to apply changes.",
-            );
-          }),
+      .addToggle(toggle =>
+        toggle.setValue(this.plugin.settings.enableDynamicTools).onChange(async value => {
+          this.plugin.settings.enableDynamicTools = value;
+          await this.plugin.saveSettings();
+          new Notice("Dynamic tools setting changed. Please restart the server to apply changes.");
+        }),
       );
 
     new Setting(containerEl)
       .setName("Schema directory")
       .setDesc("Directory path for schema files (relative to vault root)")
-      .addText((text) =>
+      .addText(text =>
         text
           .setPlaceholder("metadata/schemas")
           .setValue(this.plugin.settings.dynamicToolsPath)
@@ -210,11 +190,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       if (dynamicTools.length > 0) {
         new Setting(containerEl).setName("Loaded dynamic tools").setHeading();
         for (const toolName of dynamicTools) {
-          this.createToggleSetting(
-            containerEl,
-            toolName,
-            `Dynamic tool: ${toolName}`,
-          );
+          this.createToggleSetting(containerEl, toolName, `Dynamic tool: ${toolName}`);
         }
       } else {
         new Setting(containerEl)
@@ -224,44 +200,32 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     }
   }
 
-  private createToggleSetting(
-    containerEl: HTMLElement,
-    name: string,
-    description: string,
-  ) {
+  private createToggleSetting(containerEl: HTMLElement, name: string, description: string) {
     new Setting(containerEl)
       .setName(name)
       .setDesc(description)
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.toolManager.isToolEnabled(name))
-          .onChange(async (value) => {
-            this.plugin.toolManager.setToolEnabled(name, value);
-            this.plugin.settings.disabledTools =
-              this.plugin.toolManager.getDisabledTools();
-            await this.plugin.saveSettings();
-            new Notice(
-              `Settings changed. Please restart the server to apply changes.`,
-            );
-          }),
+      .addToggle(toggle =>
+        toggle.setValue(this.plugin.toolManager.isToolEnabled(name)).onChange(async value => {
+          this.plugin.toolManager.setToolEnabled(name, value);
+          this.plugin.settings.disabledTools = this.plugin.toolManager.getDisabledTools();
+          await this.plugin.saveSettings();
+          new Notice(`Settings changed. Please restart the server to apply changes.`);
+        }),
       );
   }
 
   private displayToolsSection(containerEl: HTMLElement): void {
     new Setting(containerEl).setName("Available tools").setHeading();
 
-    Object.keys(VAULT_TOOLS).forEach((toolName) => {
-      const fullDescription =
-        TOOL_DESCRIPTIONS[toolName] ?? "No description available";
+    Object.keys(VAULT_TOOLS).forEach(toolName => {
+      const fullDescription = TOOL_DESCRIPTIONS[toolName] ?? "No description available";
       let shortDescription = fullDescription;
       if (shortDescription.length > 200) {
         shortDescription = shortDescription.slice(0, 200) + "...";
       }
       this.createToggleSetting(containerEl, toolName, shortDescription);
       const settingItems = containerEl.querySelectorAll(".setting-item");
-      const lastSetting = settingItems[settingItems.length - 1] as
-        | HTMLElement
-        | undefined;
+      const lastSetting = settingItems[settingItems.length - 1] as HTMLElement | undefined;
       if (lastSetting) {
         lastSetting.title = fullDescription;
       }
@@ -271,18 +235,15 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
   private displayResourcesSection(containerEl: HTMLElement): void {
     new Setting(containerEl).setName("Available resources").setHeading();
 
-    Object.keys(VAULT_RESOURCES).forEach((resourceName) => {
-      const fullDescription =
-        RESOURCE_DESCRIPTIONS[resourceName] ?? "No description available";
+    Object.keys(VAULT_RESOURCES).forEach(resourceName => {
+      const fullDescription = RESOURCE_DESCRIPTIONS[resourceName] ?? "No description available";
       let shortDescription = fullDescription;
       if (shortDescription.length > 200) {
         shortDescription = shortDescription.slice(0, 200) + "...";
       }
       this.createToggleSetting(containerEl, resourceName, shortDescription);
       const settingItems = containerEl.querySelectorAll(".setting-item");
-      const lastSetting = settingItems[settingItems.length - 1] as
-        | HTMLElement
-        | undefined;
+      const lastSetting = settingItems[settingItems.length - 1] as HTMLElement | undefined;
       if (lastSetting) {
         lastSetting.title = fullDescription;
       }
@@ -295,9 +256,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
     const sessions: SessionInfo[] = serverManager.getSessionInfo();
 
     if (!sessions.length) {
-      new Setting(containerEl)
-        .setDesc("No active sessions.")
-        .setClass("setting-item-description");
+      new Setting(containerEl).setDesc("No active sessions.").setClass("setting-item-description");
     } else {
       sessions.forEach((session: SessionInfo) => {
         new Setting(containerEl)
@@ -307,7 +266,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       });
     }
 
-    new Setting(containerEl).addButton((button) =>
+    new Setting(containerEl).addButton(button =>
       button.setButtonText("Refresh sessions").onClick(() => {
         this.display();
       }),

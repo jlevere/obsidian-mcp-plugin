@@ -42,7 +42,7 @@ export function registerListSchemasHandler(
 
         // Return detailed information about each schema
         return {
-          content: schemas.map((schema) => ({
+          content: schemas.map(schema => ({
             type: "text" as const,
             text: [
               `Schema: ${schema.metadata.schemaName}`,
@@ -50,9 +50,7 @@ export function registerListSchemasHandler(
               `Path Template: ${schema.metadata.pathTemplate}`,
               `Required Fields: ${schema.metadata.pathComponents.join(", ")}`,
               `Fields:`,
-              ...Object.entries(
-                schema.fields as Record<string, SchemaField>,
-              ).map(
+              ...Object.entries(schema.fields as Record<string, SchemaField>).map(
                 ([name, field]) =>
                   `  - ${name} (${field.type})${
                     field.required ? "" : " (optional)"

@@ -21,11 +21,7 @@ export function registerSearchContentsHandler(app: App, mcpServer: McpServer) {
     description,
     {
       query: z.string().describe("Search query for vault"),
-      limit: z
-        .number()
-        .optional()
-        .default(5)
-        .describe("Maximum number of results to return"),
+      limit: z.number().optional().default(5).describe("Maximum number of results to return"),
     },
     async ({ query, limit }) => {
       try {
@@ -53,12 +49,7 @@ export function registerSearchContentsHandler(app: App, mcpServer: McpServer) {
             {
               type: "text",
               text: limitedResults
-                .map(
-                  (item) =>
-                    `Match\n\tfilename='${item.filename}', \n\tScore=${
-                      item.score ?? 0
-                    }`,
-                )
+                .map(item => `Match\n\tfilename='${item.filename}', \n\tScore=${item.score ?? 0}`)
                 .join("\n"),
             },
           ],

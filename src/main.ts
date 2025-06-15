@@ -63,9 +63,7 @@ export default class ObsidianMcpPlugin extends Plugin {
       await this.serverManager.start();
       this.isInitialized = true;
     } catch (error) {
-      new Notice(
-        `Failed to initialize ${PLUGIN_NAME} server: ${getErrorMessage(error)}`,
-      );
+      new Notice(`Failed to initialize ${PLUGIN_NAME} server: ${getErrorMessage(error)}`);
     }
   }
 

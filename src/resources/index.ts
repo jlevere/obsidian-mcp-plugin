@@ -1,13 +1,7 @@
 import { App } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import {
-  registerVaultMapResource,
-  metadata as vaultMapMetadata,
-} from "./vault-map";
-import {
-  registerActiveFileResource,
-  metadata as activeFileMetadata,
-} from "./active-file";
+import { registerVaultMapResource, metadata as vaultMapMetadata } from "./vault-map";
+import { registerActiveFileResource, metadata as activeFileMetadata } from "./active-file";
 import { ToolRegistry } from "@types";
 
 export const VAULT_RESOURCES: ToolRegistry = {

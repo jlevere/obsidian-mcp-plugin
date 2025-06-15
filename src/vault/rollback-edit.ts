@@ -13,17 +13,13 @@ export function registerRollbackEditHandler(app: App, mcpServer: McpServer) {
     "obsidian-mcp-rollback-edit",
     description,
     {
-      path: z
-        .string()
-        .describe("Path to the markdown file in the vault to rollback"),
+      path: z.string().describe("Path to the markdown file in the vault to rollback"),
     },
     async ({ path }) => {
       const normPath = normalizePath(path);
       if (!normPath.endsWith(".md")) {
         return {
-          content: [
-            { type: "text", text: `Only .md files can be rolled back.` },
-          ],
+          content: [{ type: "text", text: `Only .md files can be rolled back.` }],
           isError: true,
         };
       }

@@ -27,10 +27,8 @@ export class ServerManager {
   private expressApp: express.Express | null = null;
   private httpServer: http.Server | null = null;
   private mcpServer: McpServer | null = null;
-  private mcpTransports: Map<
-    string,
-    SSEServerTransport | StreamableHTTPServerTransport
-  > = new Map();
+  private mcpTransports: Map<string, SSEServerTransport | StreamableHTTPServerTransport> =
+    new Map();
   private isShuttingDown = false;
   private onToolRegistration: (() => Promise<void>) | null = null;
   private keepAliveInterval: NodeJS.Timeout | null = null;
@@ -104,10 +102,7 @@ export class ServerManager {
 
       // Bearer auth middleware
       this.expressApp.use(
-        bearerAuth(
-          () => (this.config.enableAuth ? this.config.authToken : null),
-          PLUGIN_NAME,
-        ),
+        bearerAuth(() => (this.config.enableAuth ? this.config.authToken : null), PLUGIN_NAME),
       );
 
       // Setup routes
@@ -117,9 +112,7 @@ export class ServerManager {
       await this.listen();
     } catch (error) {
       console.error(`Error starting ${PLUGIN_NAME} server:`, error);
-      new Notice(
-        `Error starting ${PLUGIN_NAME} server: ${(error as Error).message}`,
-      );
+      new Notice(`Error starting ${PLUGIN_NAME} server: ${(error as Error).message}`);
       // Clean up on error
       await this.stop();
       throw error;
@@ -169,30 +162,27 @@ export class ServerManager {
    * Sets up the StreamableHTTP endpoint that handles all HTTP methods.
    */
   private setupStreamableHttpEndpoint(): void {
-    this.expressApp?.all(
-      "/mcp",
-      async (req: express.Request, res: express.Response) => {
-        if (this.isShuttingDown) {
-          res.status(503).send("Server is shutting down");
-          return;
-        }
+    this.expressApp?.all("/mcp", async (req: express.Request, res: express.Response) => {
+      if (this.isShuttingDown) {
+        res.status(503).send("Server is shutting down");
+        return;
+      }
 
-        // Set headers for long-lived connections
-        Object.entries(this.DEFAULT_HEADERS).forEach(([key, value]) => {
-          res.setHeader(key, value);
-        });
+      // Set headers for long-lived connections
+      Object.entries(this.DEFAULT_HEADERS).forEach(([key, value]) => {
+        res.setHeader(key, value);
+      });
 
-        try {
-          const transport = await this.resolveStreamableTransport(req, res);
-          if (!transport) return;
+      try {
+        const transport = await this.resolveStreamableTransport(req, res);
+        if (!transport) return;
 
-          // Handle the request with the transport
-          await transport.handleRequest(req, res, req.body);
-        } catch (error) {
-          this.handleTransportError(error, res);
-        }
-      },
-    );
+        // Handle the request with the transport
+        await transport.handleRequest(req, res, req.body);
+      } catch (error) {
+        this.handleTransportError(error, res);
+      }
+    });
   }
 
   /**
@@ -230,26 +220,20 @@ export class ServerManager {
    * Sets up the SSE endpoint for legacy clients.
    */
   private setupSseEndpoint(): void {
-    this.expressApp?.get(
-      "/sse",
-      async (req: express.Request, res: express.Response) => {
-        if (this.isShuttingDown) {
-          res.status(503).send("Server is shutting down");
-          return;
-        }
+    this.expressApp?.get("/sse", async (req: express.Request, res: express.Response) => {
+      if (this.isShuttingDown) {
+        res.status(503).send("Server is shutting down");
+        return;
+      }
 
-        await this.setupSseConnection(req, res);
-      },
-    );
+      await this.setupSseConnection(req, res);
+    });
   }
 
   /**
    * Sets up a new SSE connection with proper headers and event handlers.
    */
-  private async setupSseConnection(
-    req: express.Request,
-    res: express.Response,
-  ): Promise<void> {
+  private async setupSseConnection(req: express.Request, res: express.Response): Promise<void> {
     // Set headers for SSE
     Object.entries(this.DEFAULT_HEADERS).forEach(([key, value]) => {
       res.setHeader(key, value);
@@ -288,20 +272,17 @@ export class ServerManager {
    * Sets up the legacy message endpoint for SSE clients.
    */
   private setupLegacyMessageEndpoint(): void {
-    this.expressApp?.post(
-      "/messages",
-      async (req: express.Request, res: express.Response) => {
-        if (this.isShuttingDown) {
-          res.status(503).send("Server is shutting down");
-          return;
-        }
+    this.expressApp?.post("/messages", async (req: express.Request, res: express.Response) => {
+      if (this.isShuttingDown) {
+        res.status(503).send("Server is shutting down");
+        return;
+      }
 
-        const transport = this.resolveSseTransport(req, res);
-        if (!transport) return;
+      const transport = this.resolveSseTransport(req, res);
+      if (!transport) return;
 
-        await transport.handlePostMessage(req, res, req.body);
-      },
-    );
+      await transport.handlePostMessage(req, res, req.body);
+    });
   }
 
   /**
@@ -352,9 +333,7 @@ export class ServerManager {
 
       this.httpServer?.listen(port, bindingHost, () => {
         this.httpServer?.removeListener("error", onError);
-        console.log(
-          `${PLUGIN_NAME} express server listening on ${bindingHost}:${port}`,
-        );
+        console.log(`${PLUGIN_NAME} express server listening on ${bindingHost}:${port}`);
         resolve();
       });
     });
@@ -376,8 +355,7 @@ export class ServerManager {
       jsonrpc: "2.0",
       error: {
         code: -32000,
-        message:
-          "Bad Request: Session exists but uses a different transport protocol",
+        message: "Bad Request: Session exists but uses a different transport protocol",
       },
       id: null,
     });
@@ -393,7 +371,7 @@ export class ServerManager {
     this.showClientConnectedNotice(req);
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: () => randomUUID(),
-      onsessioninitialized: (sid) => {
+      onsessioninitialized: sid => {
         this.mcpTransports.set(sid, transport);
       },
     });
@@ -464,11 +442,7 @@ export class ServerManager {
    * Helper method to clean up all resources.
    */
   private async cleanupResources(): Promise<void> {
-    await Promise.all([
-      this.clearKeepAlive(),
-      this.closeTransports(),
-      this.closeServers(),
-    ]);
+    await Promise.all([this.clearKeepAlive(), this.closeTransports(), this.closeServers()]);
 
     // Clear all references
     this.mcpServer = null;
@@ -519,7 +493,7 @@ export class ServerManager {
 
     // Close HTTP server
     if (this.httpServer) {
-      await new Promise<void>((resolve) => {
+      await new Promise<void>(resolve => {
         this.httpServer?.close(() => resolve());
         // Force close all connections
         setImmediate(() => {
@@ -544,14 +518,11 @@ export class ServerManager {
    * Returns info about all current sessions.
    */
   public getSessionInfo() {
-    return Array.from(this.mcpTransports.entries()).map(
-      ([sessionId, transport]) => ({
-        sessionId,
-        type:
-          transport instanceof SSEServerTransport ? "SSE" : "StreamableHTTP",
-        connected: true,
-      }),
-    );
+    return Array.from(this.mcpTransports.entries()).map(([sessionId, transport]) => ({
+      sessionId,
+      type: transport instanceof SSEServerTransport ? "SSE" : "StreamableHTTP",
+      connected: true,
+    }));
   }
 }
 
