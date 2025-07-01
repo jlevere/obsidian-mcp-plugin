@@ -19,6 +19,6 @@
       "*": ["src/*"]
     }
   },
-  "include": ["src/**/*.ts", "jest.config.ts", "esbuild.config.ts"],
+  "include": ["src/**/*.ts", "jest.config.ts", "esbuild.config.ts", "version-bump.ts"],
   "exclude": ["**/*.test.ts"]
 }
