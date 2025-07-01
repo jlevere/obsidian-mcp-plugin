@@ -79,17 +79,6 @@ export class ServerManager {
       this.expressApp = express();
       this.expressApp.use(express.json());
 
-      // Initialize server
-      this.httpServer = http.createServer((req, res) => {
-        // @ts-expect-error: express types
-        this.expressApp(req, res, (err: unknown) => {
-          if (err) {
-            console.error("Express error:", err);
-            res.statusCode = 500;
-            res.end("Internal Server Error");
-          }
-        });
-      });
       this.mcpServer = new McpServer({
         name: PLUGIN_NAME,
         version: this.version,
@@ -107,6 +96,15 @@ export class ServerManager {
 
       // Setup routes
       this.setupRoutes();
+
+      this.expressApp.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+        console.error("Express error:", err);
+        if (!res.headersSent) {
+          res.status(500).send("Internal Server Error");
+        } else {
+          next(err);
+        }
+      });
 
       // Start listening
       await this.listen();
@@ -315,26 +313,26 @@ export class ServerManager {
    * Starts the HTTP server and begins listening for connections.
    */
   private async listen(): Promise<void> {
-    if (!this.httpServer) throw new Error("Server not initialized");
+    if (!this.expressApp) throw new Error("Express app not initialized");
 
     return new Promise((resolve, reject) => {
       const { port, bindingHost } = this.config;
 
-      const onError = (error: Error & { code?: string }) => {
+      const server = this.expressApp.listen(port, bindingHost, () => {
+        console.log(`${PLUGIN_NAME} express server listening on ${bindingHost}:${port}`);
+        resolve();
+      });
+
+      // Store for later teardown.
+      this.httpServer = server;
+
+      server.once("error", (error: Error & { code?: string }) => {
         if (error.code === "EADDRINUSE") {
           const message = `Port ${port} is already in use. Please try a different port.`;
           console.error(message);
           new Notice(message);
         }
         reject(error);
-      };
-
-      this.httpServer?.once("error", onError);
-
-      this.httpServer?.listen(port, bindingHost, () => {
-        this.httpServer?.removeListener("error", onError);
-        console.log(`${PLUGIN_NAME} express server listening on ${bindingHost}:${port}`);
-        resolve();
       });
     });
   }
@@ -493,16 +491,14 @@ export class ServerManager {
 
     // Close HTTP server
     if (this.httpServer) {
-      await new Promise<void>(resolve => {
-        this.httpServer?.close(() => resolve());
-        // Force close all connections
-        setImmediate(() => {
-          try {
-            this.httpServer?.closeAllConnections();
-          } catch (e) {
-            console.warn("Error closing connections:", e);
+      await new Promise<void>((resolve, reject) => {
+        this.httpServer.close(err => {
+          if (err) {
+            console.warn("Error closing HTTP server:", err);
+            reject(err);
+          } else {
+            resolve();
           }
-          resolve();
         });
       });
     }
