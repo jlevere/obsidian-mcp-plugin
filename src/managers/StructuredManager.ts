@@ -86,7 +86,7 @@ ${schema.metadata.description}`,
     try {
       const schemas = await findAndParseSchemas(this.app, this.config);
       if (schemas.length > 0) {
-        tools.push("obsidia-mcp-list-schemas");
+        tools.push("obsidian-mcp-list-schemas");
         for (const schema of schemas) {
           const toolName = `obsidian-mcp-update-${schema.metadata.schemaName.toLowerCase()}`;
           tools.push(toolName);
