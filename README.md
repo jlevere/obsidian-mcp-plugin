@@ -9,11 +9,14 @@
 This Obsidian plugin embeds an MCP ([Model Context Protocol](https://modelcontextprotocol.io/introduction)) server directly within Obsidian, providing a streamlined
 way for applications to interact with your vault.
 
+*Desktop Only*
+
 [Installation](#installation) •
 [Features](#features) •
 [Usage](#usage) •
 [Development](#development) •
 [Schema Guide](#schemas)
+[Notes](#notes)
 
 ![obsidian-settings](./docs/obsidian-settings.png)
 
@@ -397,13 +400,16 @@ pnpm build:dev
 pnpm run build
 ```
 
+
+# Notes
+
+- This plugin is only supported on desktop Obsidian.
+- Authentication bearer tokens are stored in the plugin data.json file. This token can be rolled on demand.
+
+
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
+Contributions are welcome! Please feel free to open an issue or pull request.
 
 ## Credits
 
