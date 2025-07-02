@@ -79,7 +79,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       )
       .addText(text =>
         text
-          .setPlaceholder("0.0.0.0")
+          .setPlaceholder("127.0.0.1")
           .setValue(this.plugin.settings.bindingHost)
           .onChange(async value => {
             this.plugin.settings.bindingHost = value;
@@ -104,10 +104,10 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
         );
     };
 
-    const host = this.plugin.settings.bindingHost || "0.0.0.0";
+    const host = this.plugin.settings.bindingHost || "127.0.0.1";
     const port = this.plugin.settings.port || 3000;
-    const mcpUrl = `http://${host === "0.0.0.0" ? "localhost" : host}:${port}/mcp`;
-    const sseUrl = `http://${host === "0.0.0.0" ? "localhost" : host}:${port}/sse`;
+    const mcpUrl = `http://${host === "127.0.0.1" ? "localhost" : host}:${port}/mcp`;
+    const sseUrl = `http://${host === "127.0.0.1" ? "localhost" : host}:${port}/sse`;
 
     createEndpointSetting("Streamable HTTP", mcpUrl);
     createEndpointSetting("SSE", sseUrl);
