@@ -13,7 +13,7 @@ jest.mock("../../src/utils/helpers", () => ({
 // Mock Obsidian
 jest.mock("obsidian", () => ({
   ...jest.requireActual("obsidian"),
-  normalizePath: jest.fn((path) => path),
+  normalizePath: jest.fn(path => path),
   App: jest.fn().mockImplementation(() => ({
     vault: {
       getAbstractFileByPath: jest.fn(),
@@ -24,8 +24,7 @@ jest.mock("obsidian", () => ({
 
 // Get references to the mocked helpers
 import * as helpers from "../../src/utils/helpers";
-const getSimilarFilesSuggestion =
-  helpers.getSimilarFilesSuggestion as jest.Mock;
+const getSimilarFilesSuggestion = helpers.getSimilarFilesSuggestion as jest.Mock;
 const resolveTFileOrError = helpers.resolveTFileOrError as jest.Mock;
 
 describe("Vault Read Handler", () => {
@@ -78,8 +77,7 @@ describe("Vault Read Handler", () => {
 
   it("suggests similar files when file not found", async () => {
     const testPath = "test/path/file.md";
-    const suggestionString =
-      "\n\nDid you mean:\n- test/path/files.md\n- test/path/other-file.md";
+    const suggestionString = "\n\nDid you mean:\n- test/path/files.md\n- test/path/other-file.md";
     (app.vault.getAbstractFileByPath as jest.Mock).mockReturnValue(null);
     getSimilarFilesSuggestion.mockReturnValue(suggestionString);
     resolveTFileOrError.mockReturnValue({
@@ -114,9 +112,7 @@ describe("Vault Read Handler", () => {
     (app.vault.getAbstractFileByPath as jest.Mock).mockReturnValue(mockFolder);
     resolveTFileOrError.mockReturnValue({
       error: {
-        content: [
-          { type: "text", text: `Path exists but is a folder: ${testPath}` },
-        ],
+        content: [{ type: "text", text: `Path exists but is a folder: ${testPath}` }],
         isError: true,
       },
     });
@@ -135,8 +131,6 @@ describe("Vault Read Handler", () => {
       content: { text: string }[];
     };
     expect(errorResult.isError).toBe(true);
-    expect(errorResult.content[0].text).toContain(
-      "Path exists but is a folder",
-    );
+    expect(errorResult.content[0].text).toContain("Path exists but is a folder");
   });
 });

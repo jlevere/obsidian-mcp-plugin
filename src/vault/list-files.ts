@@ -36,7 +36,7 @@ export function registerListFilesHandler(app: App, mcpServer: McpServer) {
         .int()
         .min(1)
         .optional()
-        .transform((val) => val ?? 20)
+        .transform(val => val ?? 20)
         .describe("Maximum number of files to return. Defaults to 20."),
     },
     async ({ dir, depth, limit }) => {
