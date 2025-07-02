@@ -2,11 +2,6 @@ name: Build and Release
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: "Version to release"
-        required: true
-        type: string
 
 env:
   PLUGIN_NAME: obsidian-mcp-plugin
@@ -34,6 +29,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Get version from package.json
+        id: package-version
+        run: |
+          echo "version=v$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
+
       - name: Run tests
         run: pnpm test
 
@@ -47,4 +47,5 @@ jobs:
           files: |
             dist/main.js
             manifest.json
-          tag_name: ${{ github.event.inputs.version }}
+          tag_name: ${{ steps.package-version.outputs.version }}
+          name: Release ${{ steps.package-version.outputs.version }}
