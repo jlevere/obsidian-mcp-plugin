@@ -31,7 +31,6 @@ export class ServerManager {
     new Map();
   private isShuttingDown = false;
   private onToolRegistration: (() => Promise<void>) | null = null;
-  private keepAliveInterval: NodeJS.Timeout | null = null;
 
   constructor(
     private readonly app: App,
@@ -440,22 +439,12 @@ export class ServerManager {
    * Helper method to clean up all resources.
    */
   private async cleanupResources(): Promise<void> {
-    await Promise.all([this.clearKeepAlive(), this.closeTransports(), this.closeServers()]);
+    await Promise.all([this.closeTransports(), this.closeServers()]);
 
     // Clear all references
     this.mcpServer = null;
     this.httpServer = null;
     this.expressApp = null;
-  }
-
-  /**
-   * Clears the keep-alive interval.
-   */
-  private clearKeepAlive(): void {
-    if (this.keepAliveInterval) {
-      clearInterval(this.keepAliveInterval);
-      this.keepAliveInterval = null;
-    }
   }
 
   /**
