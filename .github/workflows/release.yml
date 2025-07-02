@@ -32,7 +32,8 @@ jobs:
       - name: Get version from package.json
         id: package-version
         run: |
-          echo "version=v$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Run tests
         run: pnpm test
