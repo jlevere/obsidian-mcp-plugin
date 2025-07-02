@@ -20,5 +20,5 @@
     }
   },
   "include": ["src/**/*.ts", "jest.config.ts", "esbuild.config.ts", "version-bump.ts"],
-  "exclude": ["**/*.test.ts"]
+  "exclude": ["**/*.test.ts", ".direnv"]
 }

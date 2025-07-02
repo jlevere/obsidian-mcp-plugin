@@ -2,7 +2,6 @@ import { App } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { findAndParseSchemas } from "./schema";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types";
 import { StructuredManagerConfig } from "../managers/StructuredManager";
 
 interface SchemaField {
@@ -25,7 +24,9 @@ export function registerListSchemasHandler(
     "obsidian-mcp-list-schemas",
     description,
     z.object({}).shape,
-    async (): Promise<CallToolResult> => {
+    async (_args: Record<string, never>, extra: unknown) => {
+      void _args;
+      void extra;
       try {
         const schemas = await findAndParseSchemas(app, config);
 
@@ -58,6 +59,7 @@ export function registerListSchemasHandler(
               ),
             ].join("\n"),
           })),
+          structuredContent: undefined,
         };
       } catch (error) {
         return {
@@ -70,6 +72,7 @@ export function registerListSchemasHandler(
             },
           ],
           isError: true,
+          structuredContent: undefined,
         };
       }
     },

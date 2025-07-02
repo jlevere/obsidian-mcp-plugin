@@ -3,7 +3,6 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { findAndParseSchemas, generateZodSchema } from "../structured-tools/schema";
 import { handleStructuredUpdate } from "../structured-tools/crud-handler";
 import { registerListSchemasHandler } from "../structured-tools/list-schemas";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types";
 
 export interface StructuredManagerConfig {
   enabled: boolean;
@@ -58,8 +57,11 @@ export class StructuredManager {
 Required fields: ${schema.metadata.pathComponents.join(", ")}
 ${schema.metadata.description}`,
             zodSchema.shape,
-            async (args: Record<string, unknown>): Promise<CallToolResult> => {
-              return await handleStructuredUpdate(this.app, schema, args);
+            async (args: Record<string, unknown>, extra: unknown) => {
+              void extra;
+
+              const result = await handleStructuredUpdate(this.app, schema, args);
+              return { ...result, structuredContent: undefined };
             },
           );
         } catch (error) {
