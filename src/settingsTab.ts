@@ -43,7 +43,7 @@ export class ObsidianMcpSettingTab extends PluginSettingTab {
       .setDesc("Restart the MCP server to apply changes")
       .addButton(button =>
         button
-          .setButtonText("Restart Server")
+          .setButtonText("Restart server")
           .setCta()
           .onClick(async () => {
             await this.plugin.restartServer();
