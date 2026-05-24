@@ -141,7 +141,6 @@ export function generateZodSchema(schema: ValidatedSchema): z.ZodObject<z.ZodRaw
       })
       .map(([name]) => name);
 
-    // Create JSON Schema
     const jsonSchema = {
       type: "object",
       properties: schema.fields,
@@ -149,14 +148,16 @@ export function generateZodSchema(schema: ValidatedSchema): z.ZodObject<z.ZodRaw
       additionalProperties: false,
     };
 
-    // Convert JSON Schema to Zod
-    const zodSchema = JSONSchemaToZod.convert(jsonSchema);
+    const zodSchema = JSONSchemaToZod.convert(
+      jsonSchema as Parameters<typeof JSONSchemaToZod.convert>[0],
+    );
 
-    return zodSchema as z.ZodObject<z.ZodRawShape>;
+    return zodSchema as unknown as z.ZodObject<z.ZodRawShape>;
   } catch (error) {
     console.error("Schema generation error:", error);
     throw new Error(
       `Failed to generate Zod schema: ${error instanceof Error ? error.message : String(error)}`,
+      { cause: error },
     );
   }
 }

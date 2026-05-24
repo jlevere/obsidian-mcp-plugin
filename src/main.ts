@@ -7,9 +7,9 @@ import { ToolManager } from "./managers/ToolManager";
 import { getErrorMessage } from "./utils/helpers";
 
 export default class ObsidianMcpPlugin extends Plugin {
-  settings: ObsidianMcpSettings;
-  toolManager: ToolManager;
-  public serverManager: ServerManager;
+  settings!: ObsidianMcpSettings;
+  toolManager!: ToolManager;
+  public serverManager!: ServerManager;
   private isRestarting = false;
   private isInitialized = false;
 

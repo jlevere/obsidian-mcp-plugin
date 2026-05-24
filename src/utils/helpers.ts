@@ -98,8 +98,7 @@ export async function buildVaultTree(
     };
 
     if (currentDepth > 0) {
-      // Get all children first
-      let allChildren = await Promise.all(
+      const resolved = await Promise.all(
         file.children.map(child =>
           buildVaultTree(app, child, {
             ...options,
@@ -108,10 +107,8 @@ export async function buildVaultTree(
         ),
       );
 
-      // Filter out null values and assert type
-      allChildren = allChildren.filter((child): child is TreeNode => child !== null);
+      let allChildren: TreeNode[] = resolved.filter((child): child is TreeNode => child !== null);
 
-      // Apply maxResults limit if specified
       if (maxResults !== Infinity && allChildren.length > maxResults) {
         allChildren = allChildren.slice(0, maxResults);
       }
@@ -191,7 +188,15 @@ export function getSimilarFilesSuggestion(app: App, normPath: string): string {
 /**
  * Attempts to resolve a file by path, returning a TFile or a standard error result.
  */
-export function resolveTFileOrError(app: App, path: string) {
+export interface ToolErrorResponse {
+  [x: string]: unknown;
+  content: { type: "text"; text: string }[];
+  isError: true;
+}
+
+export type ResolveTFileResult = { error: ToolErrorResponse } | { file: TFile; normPath: string };
+
+export function resolveTFileOrError(app: App, path: string): ResolveTFileResult {
   const normPath = normalizePath(path);
   const file = app.vault.getAbstractFileByPath(normPath);
 

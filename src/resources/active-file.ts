@@ -31,7 +31,12 @@ export const registerActiveFileResource = (app: App, mcpServer: McpServer) =>
       return { contents: [{ uri: uri.href, text: content }] };
     } catch (e) {
       return {
-        contents: [{ uri: uri.href, text: JSON.stringify({ error: `${e}` }) }],
+        contents: [
+          {
+            uri: uri.href,
+            text: JSON.stringify({ error: e instanceof Error ? e.message : String(e) }),
+          },
+        ],
         isError: true,
       };
     }

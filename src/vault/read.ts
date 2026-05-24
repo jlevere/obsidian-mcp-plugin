@@ -20,7 +20,7 @@ export function registerReadHandler(app: App, mcpServer: McpServer) {
     async ({ path }) => {
       try {
         const result = resolveTFileOrError(app, path);
-        if ("error" in result) return result;
+        if ("error" in result) return result.error;
         const { file } = result;
 
         // Use cachedRead for better performance since we're only displaying content

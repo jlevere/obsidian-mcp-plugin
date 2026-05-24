@@ -53,10 +53,7 @@ export async function handleStructuredUpdate(
 
     // Replace identifier field if it's different from path components
     if (!schema.metadata.pathComponents.includes(identifierField)) {
-      targetPath = targetPath.replace(
-        `\${${identifierField}}`,
-        String(inputArgs[identifierField]), // eslint-disable-line @typescript-eslint/no-base-to-string
-      );
+      targetPath = targetPath.replace(`\${${identifierField}}`, String(inputArgs[identifierField]));
     }
 
     // Normalize path and ensure .md extension
