@@ -153,7 +153,7 @@ export function registerDiffEditHandler(app: App, mcpServer: McpServer) {
     },
     async ({ path, udiff }) => {
       const result = resolveTFileOrError(app, path);
-      if ("error" in result) return result;
+      if ("error" in result) return result.error;
       const { file, normPath } = result;
 
       const fileContent = await app.vault.read(file);

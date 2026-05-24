@@ -312,12 +312,13 @@ export class ServerManager {
    * Starts the HTTP server and begins listening for connections.
    */
   private async listen(): Promise<void> {
-    if (!this.expressApp) throw new Error("Express app not initialized");
+    const expressApp = this.expressApp;
+    if (!expressApp) throw new Error("Express app not initialized");
 
     return new Promise((resolve, reject) => {
       const { port, bindingHost } = this.config;
 
-      const server = this.expressApp.listen(port, bindingHost, () => {
+      const server = expressApp.listen(port, bindingHost, () => {
         console.log(`${PLUGIN_NAME} express server listening on ${bindingHost}:${port}`);
         resolve();
       });
@@ -479,9 +480,10 @@ export class ServerManager {
     }
 
     // Close HTTP server
-    if (this.httpServer) {
+    const httpServer = this.httpServer;
+    if (httpServer) {
       await new Promise<void>((resolve, reject) => {
-        this.httpServer.close(err => {
+        httpServer.close(err => {
           if (err) {
             console.warn("Error closing HTTP server:", err);
             reject(err);

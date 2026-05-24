@@ -86,7 +86,9 @@ export function registerFileResources(app: App, mcpServer: McpServer) {
           contents: [
             {
               uri: uri.toString(),
-              text: JSON.stringify({ error: `${error}` }),
+              text: JSON.stringify({
+                error: error instanceof Error ? error.message : String(error),
+              }),
               mimeType: "application/json",
             },
           ],

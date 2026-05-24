@@ -2,7 +2,7 @@ import { App, prepareFuzzySearch } from "obsidian";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { SearchResponseItem } from "@types";
-import { getErrorMessage } from "utils/helpers";
+import { getErrorMessage } from "../utils/helpers";
 
 export const description = `
 Performs a fuzzy search contents across all files in the vault.
@@ -41,7 +41,7 @@ export function registerSearchContentsHandler(app: App, mcpServer: McpServer) {
           }
         }
 
-        results.sort((a, b) => b.score - a.score);
+        results.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
         const limitedResults = results.slice(0, limit);
 
         return {

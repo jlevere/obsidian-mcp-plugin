@@ -20,11 +20,11 @@
       devShells = {
         default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            nodejs
-            nodePackages.pnpm
+            nodejs_22
+            pnpm
 
             obsidian
-            nodePackages.typescript-language-server
+            typescript-language-server
             vscode-langservers-extracted
           ];
         };

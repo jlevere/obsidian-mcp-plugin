@@ -96,14 +96,11 @@ describe("Vault Read Handler", () => {
       },
     );
 
-    const errorResult = result.error as {
-      isError: boolean;
-      content: { text: string }[];
-    };
-    expect(errorResult.isError).toBe(true);
-    expect(errorResult.content[0].text).toContain("Did you mean:");
-    expect(errorResult.content[0].text).toContain("test/path/files.md");
-    expect(errorResult.content[0].text).toContain("test/path/other-file.md");
+    const content = result.content as { text: string }[];
+    expect(result.isError).toBe(true);
+    expect(content[0].text).toContain("Did you mean:");
+    expect(content[0].text).toContain("test/path/files.md");
+    expect(content[0].text).toContain("test/path/other-file.md");
   });
 
   it("handles folder path appropriately", async () => {
@@ -126,11 +123,8 @@ describe("Vault Read Handler", () => {
       },
     );
 
-    const errorResult = result.error as {
-      isError: boolean;
-      content: { text: string }[];
-    };
-    expect(errorResult.isError).toBe(true);
-    expect(errorResult.content[0].text).toContain("Path exists but is a folder");
+    const content = result.content as { text: string }[];
+    expect(result.isError).toBe(true);
+    expect(content[0].text).toContain("Path exists but is a folder");
   });
 });
